@@ -1,0 +1,53 @@
+# Stage 1: Build frontend
+FROM node:22-alpine AS frontend-builder
+ENV CI=true
+ENV NODE_OPTIONS="--max-old-space-size=4096"
+WORKDIR /app/frontend
+
+# Install dependencies
+COPY frontend/package.json frontend/yarn.lock frontend/i18-generate-hash.js ./
+COPY frontend/scripts ./scripts/
+RUN yarn install --frozen-lockfile --network-timeout 100000
+
+# Copy source and build
+COPY frontend/ ./
+ENV NODE_ENV=production
+RUN yarn build
+
+# Stage 2: Build backend
+FROM golang:1.24-alpine AS backend-builder
+WORKDIR /app
+
+# Install build dependencies
+RUN apk add --no-cache git build-base
+
+# Cache go modules
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy source
+COPY . .
+
+# Build enterprise binary
+ARG TARGETARCH
+ARG OS=linux
+RUN go build -C cmd/enterprise -tags timetzdata -o /app/signoz \
+    -ldflags "-s -w -X github.com/SigNoz/signoz/pkg/version.variant=enterprise -X github.com/SigNoz/signoz/ee/zeus.url=https://api.signoz.cloud -X github.com/SigNoz/signoz/ee/zeus.deprecatedURL=https://license.signoz.io"
+
+# Stage 3: Final image
+FROM alpine:3.20.3
+
+LABEL maintainer="signoz"
+WORKDIR /root
+
+RUN apk update && \
+    apk add ca-certificates && \
+    rm -rf /var/cache/apk/*
+
+COPY --from=backend-builder /app/signoz /root/signoz
+COPY --from=backend-builder /app/templates/email /root/templates
+COPY --from=frontend-builder /app/frontend/build/ /etc/signoz/web/
+
+RUN chmod 755 /root /root/signoz
+
+ENTRYPOINT ["./signoz", "server"]

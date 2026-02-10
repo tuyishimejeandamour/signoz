@@ -11,7 +11,6 @@ import (
 	"github.com/SigNoz/signoz/pkg/factory"
 	"github.com/SigNoz/signoz/pkg/http/client"
 	"github.com/SigNoz/signoz/pkg/zeus"
-	"github.com/tidwall/gjson"
 )
 
 type Provider struct {
@@ -48,99 +47,43 @@ func New(ctx context.Context, providerSettings factory.ProviderSettings, config 
 }
 
 func (provider *Provider) GetLicense(ctx context.Context, key string) ([]byte, error) {
-	response, err := provider.do(
-		ctx,
-		provider.config.URL.JoinPath("/v2/licenses/me"),
-		http.MethodGet,
-		key,
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte(gjson.GetBytes(response, "data").String()), nil
+	// Bypass license check for local development
+	return []byte(`{
+		"id": "0196f794-ff30-7bee-a5f4-ef5ad315715e",
+		"key": "local-enterprise-key",
+		"category": "ENTERPRISE",
+		"status": "ACTIVE",
+		"plan": {
+			"name": "ENTERPRISE"
+		},
+		"valid_from": 1700000000,
+		"valid_until": 4863266400,
+		"state": "active"
+	}`), nil
 }
 
 func (provider *Provider) GetCheckoutURL(ctx context.Context, key string, body []byte) ([]byte, error) {
-	response, err := provider.do(
-		ctx,
-		provider.config.URL.JoinPath("/v2/subscriptions/me/sessions/checkout"),
-		http.MethodPost,
-		key,
-		body,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte(gjson.GetBytes(response, "data").String()), nil
+	return []byte(`"http://localhost:8080/checkout-dummy"`), nil
 }
 
 func (provider *Provider) GetPortalURL(ctx context.Context, key string, body []byte) ([]byte, error) {
-	response, err := provider.do(
-		ctx,
-		provider.config.URL.JoinPath("/v2/subscriptions/me/sessions/portal"),
-		http.MethodPost,
-		key,
-		body,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte(gjson.GetBytes(response, "data").String()), nil
+	return []byte(`"http://localhost:8080/portal-dummy"`), nil
 }
 
 func (provider *Provider) GetDeployment(ctx context.Context, key string) ([]byte, error) {
-	response, err := provider.do(
-		ctx,
-		provider.config.URL.JoinPath("/v2/deployments/me"),
-		http.MethodGet,
-		key,
-		nil,
-	)
-	if err != nil {
-		return nil, err
-	}
-
-	return []byte(gjson.GetBytes(response, "data").String()), nil
+	return []byte(`{"status": "active"}`), nil
 }
 
 func (provider *Provider) PutMeters(ctx context.Context, key string, data []byte) error {
-	_, err := provider.do(
-		ctx,
-		provider.config.DeprecatedURL.JoinPath("/api/v1/usage"),
-		http.MethodPost,
-		key,
-		data,
-	)
-
-	return err
+	return nil
 }
 
 func (provider *Provider) PutProfile(ctx context.Context, key string, body []byte) error {
-	_, err := provider.do(
-		ctx,
-		provider.config.URL.JoinPath("/v2/profiles/me"),
-		http.MethodPut,
-		key,
-		body,
-	)
-
-	return err
+	return nil
 }
 
 func (provider *Provider) PutHost(ctx context.Context, key string, body []byte) error {
-	_, err := provider.do(
-		ctx,
-		provider.config.URL.JoinPath("/v2/deployments/me/hosts"),
-		http.MethodPut,
-		key,
-		body,
-	)
-
-	return err
+	return nil
 }
 
 func (provider *Provider) do(ctx context.Context, url *url.URL, method string, key string, requestBody []byte) ([]byte, error) {

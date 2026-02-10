@@ -111,7 +111,10 @@ services:
       # - ../common/clickhouse/storage.xml:/etc/clickhouse-server/config.d/storage.xml
   signoz:
     !!merge <<: *db-depend
-    image: signoz/signoz:${VERSION:-v0.110.1}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile.local
+    image: signoz/signoz-local:${VERSION:-dev}
     container_name: signoz
     command:
       - --config=/root/config/prometheus.yml

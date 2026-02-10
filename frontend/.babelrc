@@ -7,10 +7,5 @@
 	"plugins": [
 		"react-hot-loader/babel",
 		"@babel/plugin-proposal-class-properties"
-	],
-	"env": {
-		"production": {
-			"presets": ["minify"]
-		}
-	}
+	]
 }
