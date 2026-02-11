@@ -15,18 +15,12 @@ import get from 'api/v1/user/me/get';
 import listUserPreferences from 'api/v1/user/preferences/list';
 import getUserVersion from 'api/v1/version/get';
 import { LOCALSTORAGE } from 'constants/localStorage';
-import dayjs from 'dayjs';
 import useActiveLicenseV3 from 'hooks/useActiveLicenseV3/useActiveLicenseV3';
 import { useGetFeatureFlag } from 'hooks/useGetFeatureFlag';
 import { useGlobalEventListener } from 'hooks/useGlobalEventListener';
 import { ChangelogSchema } from 'types/api/changelog/getChangelogByVersion';
 import { FeatureFlagProps as FeatureFlags } from 'types/api/features/getFeaturesFlags';
-import {
-	LicensePlatform,
-	LicenseResModel,
-	LicenseState,
-	TrialInfo,
-} from 'types/api/licensesV3/getActive';
+import { LicenseResModel } from 'types/api/licensesV3/getActive';
 import {
 	OrgPreference,
 	UserPreference,
@@ -45,7 +39,6 @@ export function AppProvider({ children }: PropsWithChildren): JSX.Element {
 	const [activeLicense, setActiveLicense] = useState<LicenseResModel | null>(
 		null,
 	);
-	const [trialInfo, setTrialInfo] = useState<TrialInfo | null>(null);
 	const [featureFlags, setFeatureFlags] = useState<FeatureFlags[] | null>(null);
 	const [orgPreferences, setOrgPreferences] = useState<OrgPreference[] | null>(
 		null,
@@ -120,28 +113,6 @@ export function AppProvider({ children }: PropsWithChildren): JSX.Element {
 	useEffect(() => {
 		if (!isFetchingActiveLicense && activeLicenseData && activeLicenseData.data) {
 			setActiveLicense(activeLicenseData.data);
-
-			const isOnTrial = dayjs(
-				activeLicenseData.data.free_until || Date.now(),
-			).isAfter(dayjs());
-
-			const trialInfo: TrialInfo = {
-				trialStart: activeLicenseData.data.valid_from,
-				trialEnd: dayjs(activeLicenseData.data.free_until || Date.now()).unix(),
-				onTrial: isOnTrial,
-				workSpaceBlock:
-					activeLicenseData.data.state === LicenseState.EVALUATION_EXPIRED &&
-					activeLicenseData.data.platform === LicensePlatform.CLOUD,
-				trialConvertedToSubscription:
-					activeLicenseData.data.state !== LicenseState.ISSUED &&
-					activeLicenseData.data.state !== LicenseState.EVALUATING &&
-					activeLicenseData.data.state !== LicenseState.EVALUATION_EXPIRED,
-				gracePeriodEnd: dayjs(
-					activeLicenseData.data.event_queue.scheduled_at || Date.now(),
-				).unix(),
-			};
-
-			setTrialInfo(trialInfo);
 		}
 	}, [activeLicenseData, isFetchingActiveLicense]);
 
@@ -285,7 +256,6 @@ export function AppProvider({ children }: PropsWithChildren): JSX.Element {
 		setIsLoggedIn(false);
 		setUser(getUserDefaults());
 		setActiveLicense(null);
-		setTrialInfo(null);
 		setFeatureFlags(null);
 		setOrgPreferences(null);
 		setOrg(null);
@@ -297,7 +267,6 @@ export function AppProvider({ children }: PropsWithChildren): JSX.Element {
 			user,
 			userPreferences,
 			featureFlags,
-			trialInfo,
 			orgPreferences,
 			isLoggedIn,
 			org,
@@ -324,7 +293,6 @@ export function AppProvider({ children }: PropsWithChildren): JSX.Element {
 				user?.role === USER_ROLES.ADMIN || user?.role === USER_ROLES.EDITOR,
 		}),
 		[
-			trialInfo,
 			activeLicense,
 			activeLicenseFetchError,
 			userPreferences,

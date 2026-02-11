@@ -11,12 +11,10 @@ import { ArrowRight, ArrowUpRight } from 'lucide-react';
 import Card from 'periscope/components/Card/Card';
 import { useAppContext } from 'providers/App/App';
 import { AppState } from 'store/reducers';
-import { LicensePlatform } from 'types/api/licensesV3/getActive';
 import { ServicesList } from 'types/api/metrics/getService';
 import { GlobalReducer } from 'types/reducer/globalTime';
 import { USER_ROLES } from 'types/roles';
 
-import { DOCS_LINKS } from '../constants';
 import { columns, TIME_PICKER_OPTIONS } from './constants';
 
 const homeInterval = 30 * 60 * 1000;
@@ -32,7 +30,7 @@ export default function ServiceTraces({
 		(state) => state.globalTime,
 	);
 
-	const { user, activeLicense } = useAppContext();
+	const { user } = useAppContext();
 
 	const now = new Date().getTime();
 	const [timeRange, setTimeRange] = useState({
@@ -118,24 +116,13 @@ export default function ServiceTraces({
 							<Button
 								type="default"
 								className="periscope-btn secondary"
-								onClick={(): void => {
-									logEvent('Homepage: Get Started clicked', {
-										source: 'Service Traces',
-									});
+							onClick={(): void => {
+								logEvent('Homepage: Get Started clicked', {
+									source: 'Service Traces',
+								});
 
-									if (
-										activeLicense &&
-										activeLicense.platform === LicensePlatform.CLOUD
-									) {
-										history.push(ROUTES.GET_STARTED_WITH_CLOUD);
-									} else {
-										window?.open(
-											DOCS_LINKS.ADD_DATA_SOURCE,
-											'_blank',
-											'noopener noreferrer',
-										);
-									}
-								}}
+								history.push(ROUTES.GET_STARTED_WITH_CLOUD);
+							}}
 							>
 								Get Started &nbsp; <ArrowRight size={16} />
 							</Button>
@@ -160,7 +147,7 @@ export default function ServiceTraces({
 				</div>
 			</div>
 		),
-		[user?.role, activeLicense],
+		[user?.role],
 	);
 
 	const renderDashboardsList = useCallback(

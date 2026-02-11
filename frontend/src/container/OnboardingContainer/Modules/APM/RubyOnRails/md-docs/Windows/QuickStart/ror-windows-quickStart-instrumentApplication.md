@@ -1,4 +1,4 @@
-### Send traces directly to SigNoz Cloud
+### Send traces directly to Trinity Cloud
 
 **Step 1. Install dependencies**
 

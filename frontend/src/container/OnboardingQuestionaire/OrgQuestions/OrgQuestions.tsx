@@ -205,7 +205,7 @@ function OrgQuestions({
 			<div className="onboarding-header-section">
 				<div className="onboarding-header-icon">🎉</div>
 				<Typography.Title level={4} className="onboarding-header-title">
-					Welcome to SigNoz Cloud
+					Welcome to Trinity
 				</Typography.Title>
 				<Typography.Paragraph className="onboarding-header-subtitle">
 					Let&apos;s get you started

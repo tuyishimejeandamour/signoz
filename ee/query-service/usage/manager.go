@@ -80,15 +80,14 @@ func (lm *Manager) UploadUsage(ctx context.Context) {
 		return
 	}
 	for _, organization := range organizations {
-		// check if license is present or not
 		license, err := lm.licenseService.GetActive(ctx, organization.ID)
 		if err != nil {
 			zap.L().Error("failed to get active license", zap.Error(err))
 			return
 		}
-		if license == nil {
-			// we will not start the usage reporting if license is not present.
-			zap.L().Info("no license present, skipping usage reporting")
+		if license == nil || license.Key == "" {
+			// No-op when no real license key (synthetic or missing); skip usage upload.
+			zap.L().Debug("no license key present, skipping usage reporting")
 			return
 		}
 

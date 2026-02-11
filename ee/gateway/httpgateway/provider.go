@@ -214,7 +214,10 @@ func (provider *Provider) DeleteIngestionKeyLimit(ctx context.Context, orgID val
 func (provider *Provider) do(ctx context.Context, orgID valuer.UUID, method string, path string, queryParams url.Values, body []byte) ([]byte, error) {
 	license, err := provider.licensing.GetActive(ctx, orgID)
 	if err != nil {
-		return nil, errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "no valid license found").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
+		return nil, err
+	}
+	if license == nil || license.Key == "" {
+		return nil, errors.New(errors.TypeInvalidInput, errors.CodeInvalidInput, "gateway is not configured for this organization; activate a license to use gateway features")
 	}
 
 	// build url

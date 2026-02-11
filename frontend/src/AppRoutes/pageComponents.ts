@@ -226,25 +226,6 @@ export const SupportPage = Loadable(
 	() => import(/* webpackChunkName: "SupportPage" */ 'pages/Support'),
 );
 
-export const WorkspaceBlocked = Loadable(
-	() =>
-		import(/* webpackChunkName: "WorkspaceLocked" */ 'pages/WorkspaceLocked'),
-);
-
-export const WorkspaceSuspended = Loadable(
-	() =>
-		import(
-			/* webpackChunkName: "WorkspaceSuspended" */ 'pages/WorkspaceSuspended/WorkspaceSuspended'
-		),
-);
-
-export const WorkspaceAccessRestricted = Loadable(
-	() =>
-		import(
-			/* webpackChunkName: "WorkspaceAccessRestricted" */ 'pages/WorkspaceAccessRestricted'
-		),
-);
-
 export const ShortcutsPage = Loadable(
 	() => import(/* webpackChunkName: "ShortcutsPage" */ 'pages/Settings'),
 );

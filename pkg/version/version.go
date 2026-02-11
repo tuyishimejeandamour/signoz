@@ -9,7 +9,7 @@ import (
 
 // This will be set via ldflags at build time.
 var (
-	variant string = "<unset>"
+	variant string = "cloud"
 	version string = "<unset>"
 	hash    string = "<unset>"
 	time    string = "<unset>"
@@ -92,7 +92,7 @@ func (b Build) PrettyPrint(cfg Config) {
 		"*************=                               :************." + "  ___) | || (_| | |  | |_| | | | | (_| |  ___) | | (_| | |\\  | (_) / / _ _ _ ",
 		":************+    ----:                      -***********= " + " |____/ \\__\\__,_|_|   \\__|_|_| |_|\\__, | |____/|_|\\__, |_| \\_|\\___/___(_|_|_)",
 		" :************.   *****                      +**********:  " + "                                  |___/           |___/                      ",
-		"  .=**********+   :****=                    -*********+.   " + " Version: " + b.version + " (" + b.variant + ")" + " [Copyright " + strconv.Itoa(year) + " SigNoz, All rights reserved]",
+		"  .=**********+   :****=                    -*********+.   " + " Version: " + b.version + " (" + b.variant + ")" + " [Copyright " + strconv.Itoa(year) + " Pivot Access Ltd. All rights reserved]",
 		"    :+*********+   :+***+                  -********+:     ",
 		"      :+********+.                        =*******+-       ",
 		"        :=********=.                    -*******=:         ",

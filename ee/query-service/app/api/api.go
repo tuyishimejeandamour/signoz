@@ -99,7 +99,6 @@ func (ah *APIHandler) RegisterRoutes(router *mux.Router, am *middleware.AuthZ) {
 
 	// v3
 	router.HandleFunc("/api/v3/licenses", am.AdminAccess(ah.LicensingAPI.Activate)).Methods(http.MethodPost)
-	router.HandleFunc("/api/v3/licenses", am.AdminAccess(ah.LicensingAPI.Refresh)).Methods(http.MethodPut)
 	router.HandleFunc("/api/v3/licenses/active", am.ViewAccess(ah.LicensingAPI.GetActive)).Methods(http.MethodGet)
 
 	// v4

@@ -1,24 +1,24 @@
 
-The SigNoz Enterprise license (the "Enterprise License")
-Copyright (c) 2020 - present SigNoz Inc.
+The Trinity Enterprise license (the "Enterprise License")
+Copyright (c) 2020 - present Pivot Access Ltd.
 
-With regard to the SigNoz Software:
+With regard to the Trinity Software:
 
 This software and associated documentation files (the "Software") may only be
 used in production, if you (and any entity that you represent) have agreed to,
-and are in compliance with, the SigNoz Subscription Terms of Service, available
-via email (hello@signoz.io) (the "Enterprise Terms"), or other
-agreement governing the use of the Software, as agreed by you and SigNoz,
-and otherwise have a valid SigNoz Enterprise license for the
+and are in compliance with, the Trinity Subscription Terms of Service, available
+via Pivot Access Ltd (the "Enterprise Terms"), or other
+agreement governing the use of the Software, as agreed by you and Pivot Access Ltd,
+and otherwise have a valid Trinity Enterprise license for the
 correct number of user seats. Subject to the foregoing sentence, you are free to
-modify this Software and publish patches to the Software. You agree that SigNoz
+modify this Software and publish patches to the Software. You agree that Pivot Access Ltd
 and/or its licensors (as applicable) retain all right, title and interest in and
 to all such modifications and/or patches, and all such modifications and/or
 patches may only be used, copied, modified, displayed, distributed, or otherwise
-exploited with a valid SigNoz Enterprise license for the  correct
+exploited with a valid Trinity Enterprise license for the  correct
 number of user seats.  Notwithstanding the foregoing, you may copy and modify
 the Software for development and testing purposes, without requiring a
-subscription.  You agree that SigNoz and/or its licensors (as applicable) retain
+subscription.  You agree that Pivot Access Ltd and/or its licensors (as applicable) retain
 all right, title and interest in and to all such modifications.  You are not
 granted any other rights beyond what is expressly stated herein.  Subject to the
 foregoing, it is forbidden to copy, merge, publish, distribute, sublicense,
@@ -32,6 +32,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-For all third party components incorporated into the SigNoz Software, those
+For all third party components incorporated into the Trinity Software, those
 components are licensed under the original license provided by the owner of the
 applicable component.

@@ -1,6 +1,6 @@
-## Create SigNoz OTel Collector Configuration file 
+## Create Trinity OTel Collector Configuration file 
 
-To setup the SigNoz OTel Collector config, follow these two steps:
+To setup the Trinity OTel Collector config, follow these two steps:
 
 ### Step 1: 
 Navigate to the AWS Parameter store and create a new parameter named **/ecs/signoz/otelcol-daemon.yaml**
@@ -12,7 +12,7 @@ wget https://github.com/SigNoz/benchmark/raw/main/ecs/otelcol-daemon.yaml
 ```
 &nbsp;
 
-Update `{region}` and `SIGNOZ_INGESTION_KEY` values in your YAML configuration file with your SigNoz cloud values mentioned below:
+Update `{region}` and `SIGNOZ_INGESTION_KEY` values in your YAML configuration file with your Trinity cloud values mentioned below:
 
 {region} : `{{REGION}}`
 

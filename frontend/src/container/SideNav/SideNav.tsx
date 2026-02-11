@@ -131,7 +131,6 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 	const {
 		user,
 		featureFlags,
-		trialInfo,
 		isLoggedIn,
 		userPreferences,
 		changelog,
@@ -215,12 +214,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 		};
 	}, [checkScroll]);
 
-	const {
-		isCloudUser,
-		isEnterpriseSelfHostedUser,
-		isCommunityUser,
-		isCommunityEnterpriseUser,
-	} = useGetTenantLicense();
+	const { isCloudUser } = useGetTenantLicense();
 
 	const [licenseTag, setLicenseTag] = useState('');
 	const isAdmin = user.role === USER_ROLES.ADMIN;
@@ -254,8 +248,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 	}, [userPreferences]);
 
 	const computedSecondaryMenuItems = useMemo(() => {
-		const shouldShowIntegrationsValue =
-			(isCloudUser || isEnterpriseSelfHostedUser) && (isAdmin || isEditor);
+		const shouldShowIntegrationsValue = isAdmin || isEditor;
 
 		return defaultMoreMenuItems.map((item) => ({
 			...item,
@@ -269,8 +262,6 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 		}));
 	}, [
 		computedPinnedMenuItems,
-		isCloudUser,
-		isEnterpriseSelfHostedUser,
 		isAdmin,
 		isEditor,
 	]);
@@ -434,8 +425,6 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 
 	const { registerShortcut, deregisterShortcut } = useKeyboardHotkeys();
 
-	const isWorkspaceBlocked = trialInfo?.workSpaceBlock || false;
-
 	const openInNewTab = (path: string): void => {
 		window.open(path, '_blank');
 	};
@@ -505,21 +494,11 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 					label: 'Account Settings',
 					dataTestId: 'account-settings-nav-item',
 				},
-				{
-					key: 'workspace',
-					label: 'Workspace Settings',
-					disabled: isWorkspaceBlocked,
-					dataTestId: 'workspace-settings-nav-item',
-				},
-				...(isEnterpriseSelfHostedUser || isCommunityEnterpriseUser
-					? [
-							{
-								key: 'license',
-								label: 'Manage License',
-								dataTestId: 'manage-license-nav-item',
-							},
-					  ]
-					: []),
+			{
+				key: 'workspace',
+				label: 'Workspace Settings',
+				dataTestId: 'workspace-settings-nav-item',
+			},
 				{ type: 'divider' as const },
 				{
 					key: 'logout',
@@ -529,30 +508,12 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 					dataTestId: 'logout-nav-item',
 				},
 			].filter(Boolean),
-		[
-			isEnterpriseSelfHostedUser,
-			isCommunityEnterpriseUser,
-			user.email,
-			isWorkspaceBlocked,
-		],
+		[user.email],
 	);
 
 	useEffect(() => {
-		if (isCloudUser) {
-			setLicenseTag('Cloud');
-		} else if (isEnterpriseSelfHostedUser) {
-			setLicenseTag('Enterprise');
-		} else if (isCommunityEnterpriseUser) {
-			setLicenseTag('Free');
-		} else if (isCommunityUser) {
-			setLicenseTag('Community');
-		}
-	}, [
-		isCloudUser,
-		isEnterpriseSelfHostedUser,
-		isCommunityEnterpriseUser,
-		isCommunityUser,
-	]);
+		setLicenseTag('Cloud');
+	}, []);
 
 	useEffect(() => {
 		if (!isAdmin) {
@@ -563,15 +524,13 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 			);
 		}
 
-		const showAddCreditCardModal =
-			!isPremiumSupportEnabled && !trialInfo?.trialConvertedToSubscription;
+		const showAddCreditCardModal = !isPremiumSupportEnabled;
 
 		if (
 			!(
 				isLoggedIn &&
 				isChatSupportEnabled &&
-				!showAddCreditCardModal &&
-				(isCloudUser || isEnterpriseSelfHostedUser)
+				!showAddCreditCardModal
 			)
 		) {
 			setHelpSupportDropdownMenuItems((prevState) =>
@@ -649,7 +608,6 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 		isChatSupportEnabled,
 		isPremiumSupportEnabled,
 		isCloudUser,
-		trialInfo,
 		changelog,
 	]);
 
@@ -800,11 +758,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 					key={item.key || index}
 					item={item}
 					isActive={activeMenuKey === item.key}
-					isDisabled={
-						isWorkspaceBlocked &&
-						item.key !== ROUTES.BILLING &&
-						item.key !== ROUTES.SETTINGS
-					}
+					isDisabled={false}
 					onTogglePin={
 						allowPin
 							? (item): void => {
@@ -866,9 +820,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 					break;
 				case 'chat-support':
 					if (window.pylon) {
-						// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-						// @ts-ignore
-						window.Pylon('show');
+						window.Pylon?.('show');
 					}
 					break;
 				case 'changelog-1':
@@ -935,7 +887,6 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 		isCurrentVersionError,
 		isLatestVersion,
 		isCloudUser,
-		isEnterpriseSelfHostedUser,
 	]);
 
 	return (
@@ -960,14 +911,13 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 									onClickHandler(ROUTES.HOME, event);
 								}}
 							>
-								<img src="/Logos/signoz-brand-logo.svg" alt="SigNoz" />
+								<img src="/Logos/trinity-brand-logo.svg" alt="Trinity" />
 							</div>
 
 							{licenseTag && (
 								<div
 									className={cx(
 										'brand-title-section',
-										isCommunityEnterpriseUser && 'community-enterprise-user',
 										isCloudUser && 'cloud-user',
 										showVersionUpdateNotification &&
 											changelog &&
@@ -1028,11 +978,7 @@ function SideNav({ isPinned }: { isPinned: boolean }): JSX.Element {
 							<div className="get-started-nav-items">
 								<Button
 									className="get-started-btn"
-									disabled={isWorkspaceBlocked}
 									onClick={(event: MouseEvent): void => {
-										if (isWorkspaceBlocked) {
-											return;
-										}
 										onClickGetStarted(event);
 									}}
 								>

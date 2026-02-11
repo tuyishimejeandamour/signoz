@@ -21,26 +21,13 @@ export const getRoutes = (
 	userRole: ROLES | null,
 	isCurrentOrgSettings: boolean,
 	isGatewayEnabled: boolean,
-	isWorkspaceBlocked: boolean,
 	isCloudUser: boolean,
-	isEnterpriseSelfHostedUser: boolean,
 	t: TFunction,
 ): RouteTabProps['routes'] => {
 	const settings = [];
 
 	const isAdmin = userRole === USER_ROLES.ADMIN;
 	const isEditor = userRole === USER_ROLES.EDITOR;
-
-	if (isWorkspaceBlocked && isAdmin) {
-		settings.push(
-			...organizationSettings(t),
-			...mySettings(t),
-			...billingSettings(t),
-			...keyboardShortcuts(t),
-		);
-
-		return settings;
-	}
 
 	settings.push(...generalSettings(t));
 
@@ -62,7 +49,7 @@ export const getRoutes = (
 		settings.push(...apiKeys(t));
 	}
 
-	if ((isCloudUser || isEnterpriseSelfHostedUser) && isAdmin) {
+	if (isCloudUser && isAdmin) {
 		settings.push(...customDomainSettings(t), ...billingSettings(t));
 	}
 
