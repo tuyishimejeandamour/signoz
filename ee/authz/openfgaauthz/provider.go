@@ -137,20 +137,10 @@ func (provider *provider) CreateManagedUserRoleTransactions(ctx context.Context,
 }
 
 func (provider *provider) Create(ctx context.Context, orgID valuer.UUID, role *roletypes.Role) error {
-	_, err := provider.licensing.GetActive(ctx, orgID)
-	if err != nil {
-		return errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
-	}
-
 	return provider.store.Create(ctx, roletypes.NewStorableRoleFromRole(role))
 }
 
 func (provider *provider) GetOrCreate(ctx context.Context, orgID valuer.UUID, role *roletypes.Role) (*roletypes.Role, error) {
-	_, err := provider.licensing.GetActive(ctx, orgID)
-	if err != nil {
-		return nil, errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
-	}
-
 	existingRole, err := provider.store.GetByOrgIDAndName(ctx, role.OrgID, role.Name)
 	if err != nil {
 		if !errors.Ast(err, errors.TypeNotFound) {
@@ -214,20 +204,10 @@ func (provider *provider) GetObjects(ctx context.Context, orgID valuer.UUID, id 
 }
 
 func (provider *provider) Patch(ctx context.Context, orgID valuer.UUID, role *roletypes.Role) error {
-	_, err := provider.licensing.GetActive(ctx, orgID)
-	if err != nil {
-		return errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
-	}
-
 	return provider.store.Update(ctx, orgID, roletypes.NewStorableRoleFromRole(role))
 }
 
 func (provider *provider) PatchObjects(ctx context.Context, orgID valuer.UUID, name string, relation authtypes.Relation, additions, deletions []*authtypes.Object) error {
-	_, err := provider.licensing.GetActive(ctx, orgID)
-	if err != nil {
-		return errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
-	}
-
 	additionTuples, err := roletypes.GetAdditionTuples(name, orgID, relation, additions)
 	if err != nil {
 		return err
@@ -247,11 +227,6 @@ func (provider *provider) PatchObjects(ctx context.Context, orgID valuer.UUID, n
 }
 
 func (provider *provider) Delete(ctx context.Context, orgID valuer.UUID, id valuer.UUID) error {
-	_, err := provider.licensing.GetActive(ctx, orgID)
-	if err != nil {
-		return errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
-	}
-
 	storableRole, err := provider.store.Get(ctx, orgID, id)
 	if err != nil {
 		return err

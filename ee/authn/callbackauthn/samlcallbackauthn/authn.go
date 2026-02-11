@@ -64,11 +64,6 @@ func (a *AuthN) HandleCallback(ctx context.Context, formValues url.Values) (*aut
 		return nil, err
 	}
 
-	_, err = a.licensing.GetActive(ctx, authDomain.StorableAuthDomain().OrgID)
-	if err != nil {
-		return nil, errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
-	}
-
 	sp, err := a.serviceProvider(state.URL, authDomain)
 	if err != nil {
 		return nil, err

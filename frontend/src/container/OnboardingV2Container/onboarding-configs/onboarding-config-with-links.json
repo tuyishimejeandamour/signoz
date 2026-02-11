@@ -26,7 +26,7 @@
 		"dataSource": "migrate-from-datadog",
 		"label": "From Datadog",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Trinity"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -76,7 +76,7 @@
 		"dataSource": "migrate-from-grafana",
 		"label": "From Grafana",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Trinity"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -125,7 +125,7 @@
 		"dataSource": "migrate-from-elk",
 		"label": "From ELK",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Trinity"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -175,7 +175,7 @@
 		"dataSource": "migrate-from-newrelic",
 		"label": "From New Relic",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Trinity"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -225,7 +225,7 @@
 		"dataSource": "migrate-from-honeycomb",
 		"label": "From Honeycomb",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Trinity"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -247,9 +247,9 @@
 	},
 	{
 		"dataSource": "migrate-signoz-self-host-to-cloud",
-		"label": "From SigNoz Self-Host",
+		"label": "From Trinity Self-Host",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Trinity"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [
@@ -270,14 +270,14 @@
 			"signoz cloud",
 			"signoz self-hosted"
 		],
-		"imgUrl": "/Logos/signoz-brand-logo.svg",
+		"imgUrl": "/Logos/trinity-brand-logo.svg",
 		"link": "/docs/migration/migrate-from-signoz-self-host-to-signoz-cloud/"
 	},
 	{
 		"dataSource": "migrate-from-existing-opentelemetry",
 		"label": "From Existing OpenTelemetry",
 		"tags": [
-			"migrate to SigNoz"
+			"migrate to Trinity"
 		],
 		"module": "home",
 		"relatedSearchKeywords": [

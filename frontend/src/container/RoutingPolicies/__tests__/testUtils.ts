@@ -95,7 +95,6 @@ export function getAppContextMockState(
 			...overrides,
 		},
 		activeLicense: null,
-		trialInfo: null,
 		featureFlags: null,
 		orgPreferences: null,
 		userPreferences: null,

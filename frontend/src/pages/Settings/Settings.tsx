@@ -27,10 +27,9 @@ function SettingsPage(): JSX.Element {
 	const {
 		user,
 		featureFlags,
-		trialInfo,
 		isFetchingActiveLicense,
 	} = useAppContext();
-	const { isCloudUser, isEnterpriseSelfHostedUser } = useGetTenantLicense();
+	const { isCloudUser } = useGetTenantLicense();
 
 	const [settingsMenuItems, setSettingsMenuItems] = useState<SidebarItem[]>(
 		defaultSettingsMenuItems,
@@ -38,8 +37,6 @@ function SettingsPage(): JSX.Element {
 
 	const isAdmin = user.role === USER_ROLES.ADMIN;
 	const isEditor = user.role === USER_ROLES.EDITOR;
-
-	const isWorkspaceBlocked = trialInfo?.workSpaceBlock || false;
 
 	const [isCurrentOrgSettings] = useComponentPermission(
 		['current_org_settings'],
@@ -55,21 +52,6 @@ function SettingsPage(): JSX.Element {
 	useEffect(() => {
 		setSettingsMenuItems((prevItems) => {
 			let updatedItems = [...prevItems];
-
-			if (trialInfo?.workSpaceBlock && !isFetchingActiveLicense) {
-				updatedItems = updatedItems.map((item) => ({
-					...item,
-					isEnabled: !!(
-						isAdmin &&
-						(item.key === ROUTES.BILLING ||
-							item.key === ROUTES.ORG_SETTINGS ||
-							item.key === ROUTES.MY_SETTINGS ||
-							item.key === ROUTES.SHORTCUTS)
-					),
-				}));
-
-				return updatedItems;
-			}
 
 			if (isCloudUser) {
 				if (isAdmin) {
@@ -101,64 +83,13 @@ function SettingsPage(): JSX.Element {
 				}
 			}
 
-			if (isEnterpriseSelfHostedUser) {
-				if (isAdmin) {
-					updatedItems = updatedItems.map((item) => ({
-						...item,
-						isEnabled:
-							item.key === ROUTES.BILLING ||
-							item.key === ROUTES.INTEGRATIONS ||
-							item.key === ROUTES.API_KEYS ||
-							item.key === ROUTES.ORG_SETTINGS ||
-							item.key === ROUTES.INGESTION_SETTINGS
-								? true
-								: item.isEnabled,
-					}));
-				}
-
-				if (isEditor) {
-					// eslint-disable-next-line sonarjs/no-identical-functions
-					updatedItems = updatedItems.map((item) => ({
-						...item,
-						isEnabled:
-							item.key === ROUTES.INTEGRATIONS ||
-							item.key === ROUTES.INGESTION_SETTINGS
-								? true
-								: item.isEnabled,
-					}));
-				}
-			}
-
-			if (!isCloudUser && !isEnterpriseSelfHostedUser) {
-				if (isAdmin) {
-					updatedItems = updatedItems.map((item) => ({
-						...item,
-						isEnabled:
-							item.key === ROUTES.API_KEYS || item.key === ROUTES.ORG_SETTINGS
-								? true
-								: item.isEnabled,
-					}));
-				}
-
-				// disable billing and integrations for non-cloud users
-				updatedItems = updatedItems.map((item) => ({
-					...item,
-					isEnabled:
-						item.key === ROUTES.BILLING || item.key === ROUTES.INTEGRATIONS
-							? false
-							: item.isEnabled,
-				}));
-			}
-
 			return updatedItems;
 		});
 	}, [
 		isAdmin,
 		isEditor,
 		isCloudUser,
-		isEnterpriseSelfHostedUser,
 		isFetchingActiveLicense,
-		trialInfo?.workSpaceBlock,
 		pathname,
 	]);
 
@@ -168,18 +99,14 @@ function SettingsPage(): JSX.Element {
 				user.role,
 				isCurrentOrgSettings,
 				isGatewayEnabled,
-				isWorkspaceBlocked,
 				isCloudUser,
-				isEnterpriseSelfHostedUser,
 				t,
 			),
 		[
 			user.role,
 			isCurrentOrgSettings,
 			isGatewayEnabled,
-			isWorkspaceBlocked,
 			isCloudUser,
-			isEnterpriseSelfHostedUser,
 			t,
 		],
 	);

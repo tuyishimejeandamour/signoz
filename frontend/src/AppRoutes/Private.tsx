@@ -14,7 +14,6 @@ import { isEmpty } from 'lodash-es';
 import { useAppContext } from 'providers/App/App';
 import { SuccessResponseV2 } from 'types/api';
 import APIError from 'types/api/error';
-import { LicensePlatform, LicenseState } from 'types/api/licensesV3/getActive';
 import { OrgPreference } from 'types/api/preferences/preference';
 import { Organization } from 'types/api/user/getOrganization';
 import { UserResponse } from 'types/api/user/getUser';
@@ -38,9 +37,6 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		user,
 		isLoggedIn: isLoggedInState,
 		isFetchingOrgPreferences,
-		activeLicense,
-		isFetchingActiveLicense,
-		trialInfo,
 		featureFlags,
 	} = useAppContext();
 
@@ -120,101 +116,6 @@ function PrivateRoute({ children }: PrivateRouteProps): JSX.Element {
 		usersData,
 		pathname,
 	]);
-
-	const navigateToWorkSpaceBlocked = (route: any): void => {
-		const { path } = route;
-
-		const isRouteEnabledForWorkspaceBlockedState =
-			isAdmin &&
-			(path === ROUTES.SETTINGS ||
-				path === ROUTES.ORG_SETTINGS ||
-				path === ROUTES.BILLING ||
-				path === ROUTES.MY_SETTINGS);
-
-		if (
-			path &&
-			path !== ROUTES.WORKSPACE_LOCKED &&
-			!isRouteEnabledForWorkspaceBlockedState
-		) {
-			history.push(ROUTES.WORKSPACE_LOCKED);
-		}
-	};
-
-	const navigateToWorkSpaceAccessRestricted = (route: any): void => {
-		const { path } = route;
-
-		if (path && path !== ROUTES.WORKSPACE_ACCESS_RESTRICTED) {
-			history.push(ROUTES.WORKSPACE_ACCESS_RESTRICTED);
-		}
-	};
-
-	useEffect(() => {
-		if (!isFetchingActiveLicense && activeLicense) {
-			const currentRoute = mapRoutes.get('current');
-
-			const isTerminated = activeLicense.state === LicenseState.TERMINATED;
-			const isExpired = activeLicense.state === LicenseState.EXPIRED;
-			const isCancelled = activeLicense.state === LicenseState.CANCELLED;
-
-			const isWorkspaceAccessRestricted = isTerminated || isExpired || isCancelled;
-
-			const { platform } = activeLicense;
-
-			if (
-				isWorkspaceAccessRestricted &&
-				platform === LicensePlatform.CLOUD &&
-				currentRoute
-			) {
-				navigateToWorkSpaceAccessRestricted(currentRoute);
-			}
-		}
-	}, [isFetchingActiveLicense, activeLicense, mapRoutes, pathname]);
-
-	useEffect(() => {
-		if (!isFetchingActiveLicense) {
-			const currentRoute = mapRoutes.get('current');
-			const shouldBlockWorkspace = trialInfo?.workSpaceBlock;
-
-			if (
-				shouldBlockWorkspace &&
-				currentRoute &&
-				activeLicense?.platform === LicensePlatform.CLOUD
-			) {
-				navigateToWorkSpaceBlocked(currentRoute);
-			}
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [
-		isFetchingActiveLicense,
-		trialInfo?.workSpaceBlock,
-		activeLicense?.platform,
-		mapRoutes,
-		pathname,
-	]);
-
-	const navigateToWorkSpaceSuspended = (route: any): void => {
-		const { path } = route;
-
-		if (path && path !== ROUTES.WORKSPACE_SUSPENDED) {
-			history.push(ROUTES.WORKSPACE_SUSPENDED);
-		}
-	};
-
-	useEffect(() => {
-		if (!isFetchingActiveLicense && activeLicense) {
-			const currentRoute = mapRoutes.get('current');
-			const shouldSuspendWorkspace =
-				activeLicense.state === LicenseState.DEFAULTED;
-
-			if (
-				shouldSuspendWorkspace &&
-				currentRoute &&
-				activeLicense.platform === LicensePlatform.CLOUD
-			) {
-				navigateToWorkSpaceSuspended(currentRoute);
-			}
-		}
-	}, [isFetchingActiveLicense, activeLicense, mapRoutes, pathname]);
 
 	useEffect(() => {
 		if (org && org.length > 0 && org[0].id !== undefined) {

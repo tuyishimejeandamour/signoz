@@ -131,7 +131,7 @@ describe('OnboardingQuestionaire Component', () => {
 		});
 	});
 
-	describe('Step 2: About SigNoz', () => {
+	describe('Step 2: About Trinity', () => {
 		it('renders about signoz questions after step 1 completion', async () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			render(<OnboardingQuestionaire />);
@@ -226,7 +226,7 @@ describe('OnboardingQuestionaire Component', () => {
 		});
 	});
 
-	describe('Step 3: Optimize SigNoz Needs', () => {
+	describe('Step 3: Optimize Trinity Needs', () => {
 		it('renders scale questions after step 2 completion', async () => {
 			const user = userEvent.setup({ pointerEventsCheck: 0 });
 			render(<OnboardingQuestionaire />);

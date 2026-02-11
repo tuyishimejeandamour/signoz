@@ -18,7 +18,7 @@ function RegionDeploymentSection({
 	return (
 		<div className="cloud-account-setup-form__form-group">
 			<div className="cloud-account-setup-form__title">
-				Where should we deploy the SigNoz Cloud stack?
+				Where should we deploy the Trinity Cloud stack?
 			</div>
 			<div className="cloud-account-setup-form__description">
 				Choose the AWS region for CloudFormation stack deployment

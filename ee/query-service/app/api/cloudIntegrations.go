@@ -67,7 +67,7 @@ func (ah *APIHandler) CloudIntegrationsGenerateConnectionParams(w http.ResponseW
 		return
 	}
 
-	if license == nil {
+	if license == nil || license.Key == "" {
 		// Return the API Key (PAT) even if the rest of the params can not be deduced.
 		// Params not returned from here will be requested from the user via form inputs.
 		// This enables gracefully degraded but working experience even for non-cloud deployments.

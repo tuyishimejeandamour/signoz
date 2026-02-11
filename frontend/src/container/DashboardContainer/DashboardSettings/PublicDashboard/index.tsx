@@ -62,9 +62,9 @@ function PublicDashboardSetting(): JSX.Element {
 
 	const { selectedDashboard } = useDashboard();
 
-	const { isCloudUser, isEnterpriseSelfHostedUser } = useGetTenantLicense();
+	const { isCloudUser } = useGetTenantLicense();
 
-	const isPublicDashboardEnabled = isCloudUser || isEnterpriseSelfHostedUser;
+	const isPublicDashboardEnabled = isCloudUser;
 
 	const { user } = useAppContext();
 

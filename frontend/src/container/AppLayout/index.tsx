@@ -66,21 +66,13 @@ import {
 	DeploymentType,
 } from 'types/api/changelog/getChangelogByVersion';
 import APIError from 'types/api/error';
-import {
-	LicenseEvent,
-	LicensePlatform,
-	LicenseState,
-} from 'types/api/licensesV3/getActive';
+import { LicenseEvent } from 'types/api/licensesV3/getActive';
 import { UserPreference } from 'types/api/preferences/preference';
 import AppReducer from 'types/reducer/app';
 import { USER_ROLES } from 'types/roles';
 import { showErrorNotification } from 'utils/error';
 import { eventEmitter } from 'utils/getEventEmitter';
-import {
-	getFormattedDate,
-	getFormattedDateWithMinutes,
-	getRemainingDays,
-} from 'utils/timeUtils';
+import { getFormattedDateWithMinutes } from 'utils/timeUtils';
 
 import { ChildrenContainer, Layout, LayoutContent } from './styles';
 import { getRouteKey } from './utils';
@@ -92,7 +84,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 	const {
 		isLoggedIn,
 		user,
-		trialInfo,
 		activeLicense,
 		isFetchingActiveLicense,
 		featureFlags,
@@ -120,27 +111,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 	const { latestVersion } = useSelector<AppState, AppReducer>(
 		(state) => state.app,
 	);
-
-	const isWorkspaceAccessRestricted = useMemo(() => {
-		if (!activeLicense) {
-			return false;
-		}
-
-		const isTerminated = activeLicense.state === LicenseState.TERMINATED;
-		const isExpired = activeLicense.state === LicenseState.EXPIRED;
-		const isCancelled = activeLicense.state === LicenseState.CANCELLED;
-		const isDefaulted = activeLicense.state === LicenseState.DEFAULTED;
-		const isEvaluationExpired =
-			activeLicense.state === LicenseState.EVALUATION_EXPIRED;
-
-		return (
-			isTerminated ||
-			isExpired ||
-			isCancelled ||
-			isDefaulted ||
-			isEvaluationExpired
-		);
-	}, [activeLicense]);
 
 	const daysSinceAccountCreation = useMemo(() => {
 		const userCreationDate = dayjs(user.createdAt);
@@ -209,13 +179,13 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		{
 			queryFn: getUserLatestVersion,
 			queryKey: ['getUserLatestVersion', user?.accessJwt],
-			enabled: isLoggedIn,
+			enabled: false, // Disabled: external GitHub API
 		},
 		{
 			queryFn: (): Promise<SuccessResponse<ChangelogSchema> | ErrorResponse> =>
 				getChangelogByVersion(latestVersion, changelogForTenant),
 			queryKey: ['getChangelogByVersion', latestVersion, changelogForTenant],
-			enabled: isLoggedIn && Boolean(latestVersion),
+			enabled: false, // Disabled: external cms.signoz.cloud API
 		},
 	]);
 
@@ -240,8 +210,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 			Boolean(latestVersion) &&
 			seenChangelogVersion != null &&
 			latestVersion !== seenChangelogVersion &&
-			daysSinceAccountCreation > MIN_ACCOUNT_AGE_FOR_CHANGELOG && // Show to only users older than 2 weeks
-			!isWorkspaceAccessRestricted
+			daysSinceAccountCreation > MIN_ACCOUNT_AGE_FOR_CHANGELOG // Show to only users older than 2 weeks
 		) {
 			// Automatically open the changelog modal for cloud users after 1s, if they've not seen this version before.
 			timer = setTimeout(() => {
@@ -258,7 +227,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		latestVersion,
 		seenChangelogVersion,
 		toggleChangelogModal,
-		isWorkspaceAccessRestricted,
 	]);
 
 	useEffect(() => {
@@ -405,36 +373,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		pathname === ROUTES.GET_STARTED_AZURE_MONITORING ||
 		isPublicDashboard;
 
-	const [showTrialExpiryBanner, setShowTrialExpiryBanner] = useState(false);
-
-	const [showWorkspaceRestricted, setShowWorkspaceRestricted] = useState(false);
-
-	useEffect(() => {
-		if (
-			!isFetchingActiveLicense &&
-			activeLicense &&
-			trialInfo?.onTrial &&
-			!trialInfo?.trialConvertedToSubscription &&
-			!trialInfo?.workSpaceBlock &&
-			getRemainingDays(trialInfo?.trialEnd) < 7
-		) {
-			setShowTrialExpiryBanner(true);
-		}
-	}, [isFetchingActiveLicense, activeLicense, trialInfo]);
-
-	useEffect(() => {
-		if (!isFetchingActiveLicense && activeLicense) {
-			const { platform } = activeLicense;
-
-			if (
-				isWorkspaceAccessRestricted &&
-				platform === LicensePlatform.SELF_HOSTED
-			) {
-				setShowWorkspaceRestricted(true);
-			}
-		}
-	}, [isFetchingActiveLicense, activeLicense, isWorkspaceAccessRestricted]);
-
 	useEffect(() => {
 		if (
 			!isFetchingActiveLicense &&
@@ -446,9 +384,8 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 	}, [activeLicense, isFetchingActiveLicense]);
 
 	useEffect(() => {
-		// after logging out hide the trial expiry banner
+		// after logging out hide banners
 		if (!isLoggedIn) {
-			setShowTrialExpiryBanner(false);
 			setShowPaymentFailedWarning(false);
 			setShowSlowApiWarning(false);
 		}
@@ -482,8 +419,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		if (
 			!isFetchingFeatureFlags &&
 			(featureFlags || featureFlagsFetchError) &&
-			activeLicense &&
-			trialInfo
+			activeLicense
 		) {
 			let isChatSupportEnabled = false;
 			let isPremiumSupportEnabled = false;
@@ -500,7 +436,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 				isLoggedIn &&
 				!isPremiumSupportEnabled &&
 				isChatSupportEnabled &&
-				!trialInfo?.trialConvertedToSubscription &&
 				isCloudUserVal
 			);
 		}
@@ -512,7 +447,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		isFetchingFeatureFlags,
 		isLoggedIn,
 		activeLicense,
-		trialInfo,
 	]);
 
 	// Listen for API warnings
@@ -561,8 +495,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 	useEffect(() => {
 		if (
 			showSlowApiWarning &&
-			trialInfo?.onTrial &&
-			!trialInfo?.trialConvertedToSubscription &&
 			!slowApiWarningShown
 		) {
 			setSlowApiWarningShown(true);
@@ -570,7 +502,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 			notifications.info({
 				message: (
 					<div>
-						Our systems are taking longer than expected for your trial workspace.
+						Our systems are taking longer than expected.
 						Please{' '}
 						{user.role === USER_ROLES.ADMIN ? (
 							<span>
@@ -607,80 +539,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		handleFailedPayment,
 		slowApiWarningShown,
 		handleUpgrade,
-		trialInfo?.onTrial,
-		trialInfo?.trialConvertedToSubscription,
 	]);
-
-	const renderWorkspaceRestrictedBanner = (): JSX.Element => (
-		<div className="workspace-restricted-banner">
-			{activeLicense?.state === LicenseState.TERMINATED && (
-				<>
-					Your SigNoz license is terminated, enterprise features have been disabled.
-					Please contact support at{' '}
-					<a href="mailto:support@signoz.io">support@signoz.io</a> for new license
-				</>
-			)}
-			{activeLicense?.state === LicenseState.EXPIRED && (
-				<>
-					Your SigNoz license has expired. Please contact support at{' '}
-					<a href="mailto:support@signoz.io">support@signoz.io</a> for renewal to
-					avoid termination of license as per our{' '}
-					<a
-						href="https://signoz.io/terms-of-service"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						terms of service
-					</a>
-				</>
-			)}
-			{activeLicense?.state === LicenseState.CANCELLED && (
-				<>
-					Your SigNoz license is cancelled. Please contact support at{' '}
-					<a href="mailto:support@signoz.io">support@signoz.io</a> for reactivation
-					to avoid termination of license as per our{' '}
-					<a
-						href="https://signoz.io/terms-of-service"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						terms of service
-					</a>
-				</>
-			)}
-
-			{activeLicense?.state === LicenseState.DEFAULTED && (
-				<>
-					Your SigNoz license is defaulted. Please clear the bill to continue using
-					the enterprise features. Contact support at{' '}
-					<a href="mailto:support@signoz.io">support@signoz.io</a> to avoid
-					termination of license as per our{' '}
-					<a
-						href="https://signoz.io/terms-of-service"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						terms of service
-					</a>
-				</>
-			)}
-
-			{activeLicense?.state === LicenseState.EVALUATION_EXPIRED && (
-				<>
-					Your SigNoz trial has ended. Please contact support at{' '}
-					<a href="mailto:support@signoz.io">support@signoz.io</a> for next steps to
-					avoid termination of license as per our{' '}
-					<a
-						href="https://signoz.io/terms-of-service"
-						target="_blank"
-						rel="noopener noreferrer"
-					>
-						terms of service
-					</a>
-				</>
-			)}
-		</div>
-	);
 
 	const { registerShortcut, deregisterShortcut } = useKeyboardHotkeys();
 	const { updateUserPreferenceInContext } = useAppContext();
@@ -761,11 +620,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 		};
 	}, [registerShortcut, deregisterShortcut, handleToggleSidebar]);
 
-	const SHOW_TRIAL_EXPIRY_BANNER =
-		showTrialExpiryBanner && !showPaymentFailedWarning;
-	const SHOW_WORKSPACE_RESTRICTED_BANNER = showWorkspaceRestricted;
-	const SHOW_PAYMENT_FAILED_BANNER =
-		!showTrialExpiryBanner && showPaymentFailedWarning;
+	const SHOW_PAYMENT_FAILED_BANNER = showPaymentFailedWarning;
 
 	return (
 		<Layout className={cx(isDarkMode ? 'darkMode dark' : 'lightMode')}>
@@ -775,31 +630,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 
 			{isLoggedIn && (
 				<div className={cx('app-banner-wrapper')}>
-					{SHOW_TRIAL_EXPIRY_BANNER && (
-						<div className="trial-expiry-banner">
-							You are in free trial period. Your free trial will end on{' '}
-							<span>{getFormattedDate(trialInfo?.trialEnd || Date.now())}.</span>
-							{user.role === USER_ROLES.ADMIN ? (
-								<span>
-									{' '}
-									Please{' '}
-									<a className="upgrade-link" onClick={handleUpgrade}>
-										upgrade
-									</a>
-									to continue using SigNoz features.
-									<span className="refresh-payment-status">
-										{' '}
-										| Already upgraded? <RefreshPaymentStatus type="text" />
-									</span>
-								</span>
-							) : (
-								'Please contact your administrator for upgrading to a paid plan.'
-							)}
-						</div>
-					)}
-
-					{SHOW_WORKSPACE_RESTRICTED_BANNER && renderWorkspaceRestrictedBanner()}
-
 					{SHOW_PAYMENT_FAILED_BANNER && (
 						<div className="payment-failed-banner">
 							Your bill payment has failed. Your workspace will get suspended on{' '}
@@ -816,7 +646,7 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 									<a className="upgrade-link" onClick={handleFailedPayment}>
 										pay the bill
 									</a>
-									to continue using SigNoz features.
+									to continue using Trinity features.
 									<span className="refresh-payment-status">
 										{' '}
 										| Already paid? <RefreshPaymentStatus type="text" />
@@ -835,8 +665,6 @@ function AppLayout(props: AppLayoutProps): JSX.Element {
 					'app-layout',
 					isDarkMode ? 'darkMode dark' : 'lightMode',
 					isSideNavPinned ? 'side-nav-pinned' : '',
-					SHOW_WORKSPACE_RESTRICTED_BANNER ? 'isWorkspaceRestricted' : '',
-					SHOW_TRIAL_EXPIRY_BANNER ? 'isTrialExpired' : '',
 					SHOW_PAYMENT_FAILED_BANNER ? 'isPaymentFailed' : '',
 				)}
 			>

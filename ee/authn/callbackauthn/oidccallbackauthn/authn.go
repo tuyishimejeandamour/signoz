@@ -75,11 +75,6 @@ func (a *AuthN) HandleCallback(ctx context.Context, query url.Values) (*authtype
 		return nil, err
 	}
 
-	_, err = a.licensing.GetActive(ctx, authDomain.StorableAuthDomain().OrgID)
-	if err != nil {
-		return nil, errors.New(errors.TypeLicenseUnavailable, errors.CodeLicenseUnavailable, "a valid license is not available").WithAdditional("this feature requires a valid license").WithAdditional(err.Error())
-	}
-
 	oidcProvider, oauth2Config, err := a.oidcProviderAndoauth2Config(ctx, state.URL, authDomain)
 	if err != nil {
 		return nil, err

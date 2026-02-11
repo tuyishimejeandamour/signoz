@@ -28,7 +28,7 @@ function HeaderRightSection({
 	const [openShareURLModal, setOpenShareURLModal] = useState(false);
 	const [openAnnouncementsModal, setOpenAnnouncementsModal] = useState(false);
 
-	const { isCloudUser, isEnterpriseSelfHostedUser } = useGetTenantLicense();
+	const { isCloudUser } = useGetTenantLicense();
 
 	const handleOpenFeedbackModal = useCallback((): void => {
 		logEvent('Feedback: Clicked', {
@@ -66,7 +66,7 @@ function HeaderRightSection({
 		setOpenShareURLModal(open);
 	};
 
-	const isLicenseEnabled = isEnterpriseSelfHostedUser || isCloudUser;
+	const isLicenseEnabled = isCloudUser;
 
 	return (
 		<div className="header-right-section-container">

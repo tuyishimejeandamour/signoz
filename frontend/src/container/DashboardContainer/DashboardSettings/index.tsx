@@ -17,9 +17,9 @@ function DashboardSettings({
 	variablesSettingsTabHandle: VariablesSettingsTabHandle;
 }): JSX.Element {
 	const { user } = useAppContext();
-	const { isCloudUser, isEnterpriseSelfHostedUser } = useGetTenantLicense();
+	const { isCloudUser } = useGetTenantLicense();
 
-	const enablePublicDashboard = isCloudUser || isEnterpriseSelfHostedUser;
+	const enablePublicDashboard = isCloudUser;
 
 	const publicDashboardItem = {
 		label: (

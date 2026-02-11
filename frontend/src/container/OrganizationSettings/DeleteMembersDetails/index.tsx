@@ -17,7 +17,7 @@ function DeleteMembersDetails({
 				<Space direction="vertical">
 					<Typography>Are you sure you want to delete {name}</Typography>
 					<Typography>
-						This will remove all access from dashboards and other features in SigNoz
+						This will remove all access from dashboards and other features in Trinity
 					</Typography>
 				</Space>
 			</Space>

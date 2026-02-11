@@ -12,7 +12,7 @@ jest.mock('../../../api/browser/localstorage/get', () => ({
 const mockGet = (getLocal as unknown) as jest.Mock;
 
 describe('AppLoading', () => {
-	const SIGNOZ_TEXT = 'SigNoz';
+	const SIGNOZ_TEXT = 'Trinity';
 	const TAGLINE_TEXT =
 		'OpenTelemetry-Native Logs, Metrics and Traces in a single pane';
 	const CONTAINER_SELECTOR = '.app-loading-container';
@@ -47,7 +47,7 @@ describe('AppLoading', () => {
 		// Check for brand logo
 		const logo = screen.getByAltText(SIGNOZ_TEXT);
 		expect(logo).toBeInTheDocument();
-		expect(logo).toHaveAttribute('src', '/Logos/signoz-brand-logo.svg');
+		expect(logo).toHaveAttribute('src', '/Logos/trinity-brand-logo.svg');
 
 		// Check for brand title
 		const title = screen.getByText(SIGNOZ_TEXT);

@@ -17,10 +17,6 @@ var (
 
 	// License State
 	LicenseStatusInvalid = valuer.NewString("invalid")
-
-	// Plan
-	PlanNameEnterprise = valuer.NewString("enterprise")
-	PlanNameBasic      = valuer.NewString("basic")
 )
 
 type Feature struct {
@@ -31,45 +27,9 @@ type Feature struct {
 	Route      string        `json:"route"`
 }
 
-var BasicPlan = []*Feature{
-	{
-		Name:       SSO,
-		Active:     false,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	},
-	{
-		Name:       Gateway,
-		Active:     false,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	},
-	{
-		Name:       PremiumSupport,
-		Active:     false,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	},
-	{
-		Name:       AnomalyDetection,
-		Active:     false,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	},
-	{
-		Name:       DotMetricsEnabled,
-		Active:     false,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	},
-}
-
-var EnterprisePlan = []*Feature{
+// AllFeatures is the single feature set for the cloud-only product.
+// Every feature is always active.
+var AllFeatures = []*Feature{
 	{
 		Name:       SSO,
 		Active:     true,
@@ -114,17 +74,7 @@ var EnterprisePlan = []*Feature{
 	},
 	{
 		Name:       DotMetricsEnabled,
-		Active:     false,
-		Usage:      0,
-		UsageLimit: -1,
-		Route:      "",
-	},
-}
-
-var DefaultFeatureSet = []*Feature{
-	{
-		Name:       DotMetricsEnabled,
-		Active:     false,
+		Active:     true,
 		Usage:      0,
 		UsageLimit: -1,
 		Route:      "",

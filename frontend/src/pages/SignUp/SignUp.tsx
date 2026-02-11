@@ -78,7 +78,7 @@ function SignUp(): JSX.Element {
 				email: responseDetails.email,
 				name: responseDetails.name,
 				company_name: responseDetails.organization,
-				source: 'SigNoz Cloud',
+				source: 'Trinity',
 			});
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
@@ -228,7 +228,7 @@ function SignUp(): JSX.Element {
 					</Typography.Title>
 					<Typography.Paragraph className="signup-header-subtitle">
 						You&apos;re almost in. Create a password to start monitoring your
-						applications with SigNoz.
+						applications with Trinity.
 					</Typography.Paragraph>
 				</div>
 

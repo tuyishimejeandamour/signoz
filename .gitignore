@@ -231,3 +231,6 @@ pyrightconfig.json
 
 # cursor files
 frontend/.cursor/
+branch_structure.json
+temp_auto_push.bat
+temp_interactive_push.bat

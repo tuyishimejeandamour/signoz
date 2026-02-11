@@ -44,10 +44,13 @@ func (ah *APIHandler) ServeGatewayHTTP(rw http.ResponseWriter, req *http.Request
 		return
 	}
 
-	//Create headers
 	var licenseKey string
 	if license != nil {
 		licenseKey = license.Key
+	}
+	if licenseKey == "" {
+		render.Error(rw, errors.Newf(errors.TypeInvalidInput, errors.CodeInvalidInput, "gateway is not configured for this organization; activate a license to use gateway proxy"))
+		return
 	}
 
 	req.Header.Set("X-Signoz-Cloud-Api-Key", licenseKey)

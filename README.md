@@ -1,11 +1,11 @@
 <h1 align="center" style="border-bottom: none">
     <a href="https://signoz.io" target="_blank">
-        <img alt="SigNoz" src="https://github.com/user-attachments/assets/ef9a33f7-12d7-4c94-8908-0a02b22f0c18" width="100" height="100">
+        <img alt="Trinity" src="https://github.com/user-attachments/assets/ef9a33f7-12d7-4c94-8908-0a02b22f0c18" width="100" height="100">
     </a>
-    <br>SigNoz
+    <br>Trinity
 </h1>
 
-<p align="center">All your logs, metrics, and traces in one place. Monitor your application, spot issues before they occur and troubleshoot downtime quickly with rich context. SigNoz is a cost-effective open-source alternative to Datadog and New Relic. Visit <a href="https://signoz.io" target="_blank">signoz.io</a> for the full documentation, tutorials, and guide.</p>
+<p align="center">All your logs, metrics, and traces in one place. Monitor your application, spot issues before they occur and troubleshoot downtime quickly with rich context. Trinity is an observability platform by Pivot Access Ltd. Visit <a href="https://signoz.io" target="_blank">signoz.io</a> for the full documentation, tutorials, and guide.</p>
 
 <p align="center">
     <img alt="GitHub issues" src="https://img.shields.io/github/issues/signoz/signoz"> </a>
@@ -28,7 +28,7 @@
 
 ### Application Performance Monitoring
 
-Use SigNoz APM to monitor your applications and services. It comes with out-of-box charts for key application metrics like p99 latency, error rate, Apdex and operations per second. You can also monitor the database and external calls made from your application. Read [more](https://signoz.io/application-performance-monitoring/).
+Use Trinity APM to monitor your applications and services. It comes with out-of-box charts for key application metrics like p99 latency, error rate, Apdex and operations per second. You can also monitor the database and external calls made from your application. Read [more](https://signoz.io/application-performance-monitoring/).
 
 You can [instrument](https://signoz.io/docs/instrumentation/) your application with OpenTelemetry to get started.
 
@@ -37,7 +37,7 @@ You can [instrument](https://signoz.io/docs/instrumentation/) your application w
 
 ### Logs Management
 
-SigNoz can be used as a centralized log management solution. We use ClickHouse (used by likes of Uber & Cloudflare) as a datastore, ⎯ an extremely fast and highly optimized storage for logs data. Instantly search through all your logs using quick filters and a powerful query builder.
+Trinity can be used as a centralized log management solution. We use ClickHouse (used by likes of Uber & Cloudflare) as a datastore, ⎯ an extremely fast and highly optimized storage for logs data. Instantly search through all your logs using quick filters and a powerful query builder.
 
 You can also create charts on your logs and monitor them with customized dashboards. Read [more](https://signoz.io/log-management/).
 
@@ -46,7 +46,7 @@ You can also create charts on your logs and monitor them with customized dashboa
 
 ### Distributed Tracing
 
-Distributed Tracing is essential to troubleshoot issues in microservices applications. Powered by OpenTelemetry, distributed tracing in SigNoz can help you track user requests across services to help you identify performance bottlenecks. 
+Distributed Tracing is essential to troubleshoot issues in microservices applications. Powered by OpenTelemetry, distributed tracing in Trinity can help you track user requests across services to help you identify performance bottlenecks. 
 
 See user requests in a detailed breakdown with the help of Flamegraphs and Gantt Charts. Click on any span to see the entire trace represented beautifully, which will help you make sense of where issues actually occurred in the flow of requests.
 
@@ -70,7 +70,7 @@ Read [more](https://signoz.io/metrics-and-dashboards/).
 
 Monitor and debug your LLM applications with comprehensive observability. Track LLM calls, analyze token usage, monitor performance, and gain insights into your AI application's behavior in production.
 
-SigNoz LLM observability helps you understand how your language models are performing, identify issues with prompts and responses, track token usage and costs, and optimize your AI applications for better performance and reliability.
+Trinity LLM observability helps you understand how your language models are performing, identify issues with prompts and responses, track token usage and costs, and optimize your AI applications for better performance and reliability.
 
 [Get started with LLM Observability →](https://signoz.io/docs/llm-observability/)
 
@@ -79,9 +79,9 @@ SigNoz LLM observability helps you understand how your language models are perfo
 
 ### Alerts
 
-Use alerts in SigNoz to get notified when anything unusual happens in your application. You can set alerts on any type of telemetry signal (logs, metrics, traces), create thresholds and set up a notification channel to get notified. Advanced features like alert history and anomaly detection can help you create smarter alerts.
+Use alerts in Trinity to get notified when anything unusual happens in your application. You can set alerts on any type of telemetry signal (logs, metrics, traces), create thresholds and set up a notification channel to get notified. Advanced features like alert history and anomaly detection can help you create smarter alerts.
 
-Alerts in SigNoz help you identify issues proactively so that you can address them before they reach your customers.
+Alerts in Trinity help you identify issues proactively so that you can address them before they reach your customers.
 
 Read [more](https://signoz.io/alerts-management/).
 
@@ -101,9 +101,9 @@ Read [more](https://signoz.io/exceptions-monitoring/).
 
 <br /><br />
 
-## Why SigNoz?
+## Why Trinity?
 
-SigNoz is a single tool for all your monitoring and observability needs. Here are a few reasons why you should choose SigNoz:
+Trinity is a single tool for all your monitoring and observability needs. Here are a few reasons why you should choose Trinity:
 
 - Single tool for observability(logs, metrics, and traces)
 
@@ -120,9 +120,9 @@ SigNoz is a single tool for all your monitoring and observability needs. Here ar
 
 ## Getting Started
 
-### Create a SigNoz Cloud Account
+### Create a Trinity Cloud Account
 
-SigNoz cloud is the easiest way to get started with SigNoz. Our cloud service is for those users who want to spend more time in getting insights for their application performance without worrying about maintenance. 
+Trinity cloud is the easiest way to get started with Trinity. Our cloud service is for those users who want to spend more time in getting insights for their application performance without worrying about maintenance. 
 
 [Get started for free](https://signoz.io/teams/)
 
@@ -153,7 +153,7 @@ Come say Hi to us on [Slack](https://signoz.io/slack) 👋
 
 ### Languages supported:
 
-SigNoz supports all major programming languages for monitoring. Any framework and language supported by OpenTelemetry is supported by SigNoz. Find instructions for instrumenting different languages below:
+Trinity supports all major programming languages for monitoring. Any framework and language supported by OpenTelemetry is supported by Trinity. Find instructions for instrumenting different languages below:
 
 - [Java](https://signoz.io/docs/instrumentation/java/)
 - [Python](https://signoz.io/docs/instrumentation/python/)
@@ -173,51 +173,51 @@ You can find our entire documentation [here](https://signoz.io/docs/introduction
 
 ## Comparisons to Familiar Tools
 
-### SigNoz vs Prometheus
+### Trinity vs Prometheus
 
 Prometheus is good if you want to do just metrics. But if you want to have a seamless experience between metrics, logs and traces, then current experience of stitching together Prometheus & other tools is not great.
 
-SigNoz is a one-stop solution for metrics and other telemetry signals. And because you will use the same standard(OpenTelemetry) to collect all telemetry signals, you can also correlate these signals to troubleshoot quickly.
+Trinity is a one-stop solution for metrics and other telemetry signals. And because you will use the same standard(OpenTelemetry) to collect all telemetry signals, you can also correlate these signals to troubleshoot quickly.
 
 For example, if you see that there are issues with infrastructure metrics of your k8s cluster at a timestamp, you can jump to other signals like logs and traces to understand the issue quickly.
 
 <p>&nbsp  </p>
 
-### SigNoz vs Jaeger
+### Trinity vs Jaeger
 
-Jaeger only does distributed tracing. SigNoz supports metrics, traces and logs - all the 3 pillars of observability.
+Jaeger only does distributed tracing. Trinity supports metrics, traces and logs - all the 3 pillars of observability.
 
-Moreover, SigNoz has few more advanced features wrt Jaeger:
+Moreover, Trinity has few more advanced features wrt Jaeger:
 
 - Jaegar UI doesn’t show any metrics on traces or on filtered traces
-- Jaeger can’t get aggregates on filtered traces. For example, p99 latency of requests which have tag - customer_type='premium'. This can be done easily on SigNoz
-- You can also go from traces to logs easily in SigNoz
+- Jaeger can’t get aggregates on filtered traces. For example, p99 latency of requests which have tag - customer_type='premium'. This can be done easily on Trinity
+- You can also go from traces to logs easily in Trinity
 
 <p>&nbsp  </p>
 
-### SigNoz vs Elastic 
+### Trinity vs Elastic 
 
-- SigNoz Logs management are based on ClickHouse, a columnar OLAP datastore which makes aggregate log analytics queries much more efficient
+- Trinity Logs management are based on ClickHouse, a columnar OLAP datastore which makes aggregate log analytics queries much more efficient
 - 50% lower resource requirement compared to Elastic during ingestion
 
-We have published benchmarks comparing Elastic with SigNoz. Check it out [here](https://signoz.io/blog/logs-performance-benchmark/?utm_source=github-readme&utm_medium=logs-benchmark)
+We have published benchmarks comparing Elastic with Trinity. Check it out [here](https://signoz.io/blog/logs-performance-benchmark/?utm_source=github-readme&utm_medium=logs-benchmark)
 
 <p>&nbsp  </p>
 
-### SigNoz vs Loki
+### Trinity vs Loki
 
-- SigNoz supports aggregations on high-cardinality data over a huge volume while loki doesn’t.
-- SigNoz supports indexes over high cardinality data and has no limitations on the number of indexes, while Loki reaches max streams with a few indexes added to it.
-- Searching over a huge volume of data is difficult and slow in Loki compared to SigNoz
+- Trinity supports aggregations on high-cardinality data over a huge volume while loki doesn’t.
+- Trinity supports indexes over high cardinality data and has no limitations on the number of indexes, while Loki reaches max streams with a few indexes added to it.
+- Searching over a huge volume of data is difficult and slow in Loki compared to Trinity
 
-We have published benchmarks comparing Loki with SigNoz. Check it out [here](https://signoz.io/blog/logs-performance-benchmark/?utm_source=github-readme&utm_medium=logs-benchmark)
+We have published benchmarks comparing Loki with Trinity. Check it out [here](https://signoz.io/blog/logs-performance-benchmark/?utm_source=github-readme&utm_medium=logs-benchmark)
 
 <br /><br />
 
 
 ## Contributing
 
-We ❤️ contributions big or small. Please read [CONTRIBUTING.md](CONTRIBUTING.md) to get started with making contributions to SigNoz.
+We ❤️ contributions big or small. Please read [CONTRIBUTING.md](CONTRIBUTING.md) to get started with making contributions to Trinity.
 
 Not sure how to get started? Just ping us on `#contributing` in our [slack community](https://signoz.io/slack)
 
@@ -261,7 +261,7 @@ You can find docs at https://signoz.io/docs/. If you need any clarification or f
 
 ## Community
 
-Join the [slack community](https://signoz.io/slack) to know more about distributed tracing, observability, or SigNoz and to connect with other users and contributors.
+Join the [slack community](https://signoz.io/slack) to know more about distributed tracing, observability, or Trinity and to connect with other users and contributors.
 
 If you have any ideas, questions, or any feedback, please share on our [Github Discussions](https://github.com/SigNoz/signoz/discussions)
 

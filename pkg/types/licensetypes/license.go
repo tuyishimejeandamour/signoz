@@ -161,10 +161,6 @@ func NewLicense(data []byte, organizationID valuer.UUID) (*License, error) {
 		return nil, err
 	}
 	planName := valuer.NewString(planNameStr)
-	// if license status is invalid then default it to basic
-	if status == LicenseStatusInvalid {
-		planName = PlanNameBasic
-	}
 
 	state, err := extractKeyFromMapStringInterface[string](licenseData, "state")
 	if err != nil {
@@ -181,42 +177,8 @@ func NewLicense(data []byte, organizationID valuer.UUID) (*License, error) {
 		freeUntil = time.Time{}
 	}
 
-	featuresFromZeus := make([]*Feature, 0)
-	if _features, ok := licenseData["features"]; ok {
-		featuresData, err := json.Marshal(_features)
-		if err != nil {
-			return nil, errors.Wrapf(err, errors.TypeInvalidInput, errors.CodeInvalidInput, "failed to marshal features data")
-		}
-
-		if err := json.Unmarshal(featuresData, &featuresFromZeus); err != nil {
-			return nil, errors.Wrapf(err, errors.TypeInvalidInput, errors.CodeInvalidInput, "failed to unmarshal features data")
-		}
-	}
-
-	switch planName {
-	case PlanNameEnterprise:
-		features = append(features, EnterprisePlan...)
-	case PlanNameBasic:
-		features = append(features, BasicPlan...)
-	default:
-		features = append(features, BasicPlan...)
-	}
-
-	if len(featuresFromZeus) > 0 {
-		for _, feature := range featuresFromZeus {
-			exists := false
-			for i, existingFeature := range features {
-				if existingFeature.Name == feature.Name {
-					features[i] = feature // Replace existing feature
-					exists = true
-					break
-				}
-			}
-			if !exists {
-				features = append(features, feature) // Append if it doesn't exist
-			}
-		}
-	}
+	// Cloud-only: all features always enabled regardless of plan.
+	features = append(features, AllFeatures...)
 	licenseData["features"] = features
 
 	_validFrom, err := extractKeyFromMapStringInterface[float64](licenseData, "valid_from")
@@ -269,47 +231,9 @@ func NewLicenseFromStorableLicense(storableLicense *StorableLicense) (*License, 
 		return nil, err
 	}
 	planName := valuer.NewString(planNameStr)
-	// if license status is invalid then default it to basic
-	if status == LicenseStatusInvalid {
-		planName = PlanNameBasic
-	}
 
-	featuresFromZeus := make([]*Feature, 0)
-	if _features, ok := storableLicense.Data["features"]; ok {
-		featuresData, err := json.Marshal(_features)
-		if err != nil {
-			return nil, errors.Wrapf(err, errors.TypeInvalidInput, errors.CodeInvalidInput, "failed to marshal features data")
-		}
-
-		if err := json.Unmarshal(featuresData, &featuresFromZeus); err != nil {
-			return nil, errors.Wrapf(err, errors.TypeInvalidInput, errors.CodeInvalidInput, "failed to unmarshal features data")
-		}
-	}
-
-	switch planName {
-	case PlanNameEnterprise:
-		features = append(features, EnterprisePlan...)
-	case PlanNameBasic:
-		features = append(features, BasicPlan...)
-	default:
-		features = append(features, BasicPlan...)
-	}
-
-	if len(featuresFromZeus) > 0 {
-		for _, feature := range featuresFromZeus {
-			exists := false
-			for i, existingFeature := range features {
-				if existingFeature.Name == feature.Name {
-					features[i] = feature // Replace existing feature
-					exists = true
-					break
-				}
-			}
-			if !exists {
-				features = append(features, feature) // Append if it doesn't exist
-			}
-		}
-	}
+	// Cloud-only: all features always enabled regardless of plan.
+	features = append(features, AllFeatures...)
 	storableLicense.Data["features"] = features
 
 	_validFrom, err := extractKeyFromMapStringInterface[float64](storableLicense.Data, "valid_from")
@@ -390,6 +314,55 @@ func (license *License) Update(data []byte) error {
 	license.LastValidatedAt = currentTime
 
 	return nil
+}
+
+// NewSyntheticCloudLicense returns a stub license when no real license is stored.
+// Key is empty so callers that need a real key for external services can detect and degrade gracefully.
+func NewSyntheticCloudLicense(organizationID valuer.UUID) *License {
+	now := time.Now()
+	createdAt := now.UTC().Format(time.RFC3339)
+	data := map[string]any{
+		"key":        "",
+		"status":     "VALID",
+		"state":      "ACTIVE",
+		"platform":   "CLOUD",
+		"created_at": createdAt,
+		"updated_at": createdAt,
+		"plan": map[string]any{
+			"name":        "cloud",
+			"is_active":   true,
+			"description": "",
+			"created_at":  createdAt,
+			"updated_at":  createdAt,
+		},
+		"plan_id":    "",
+		"free_until": "",
+		"valid_from":  float64(0),
+		"valid_until": float64(-1),
+		"event_queue": map[string]any{
+			"event":        "",
+			"status":       "",
+			"scheduled_at": "",
+			"created_at":   createdAt,
+			"updated_at":   createdAt,
+		},
+		"features": AllFeatures,
+	}
+	return &License{
+		ID:              valuer.UUID{},
+		Key:             "",
+		Data:            data,
+		PlanName:        valuer.NewString("cloud"),
+		Features:        AllFeatures,
+		Status:          valuer.NewString("VALID"),
+		State:           "ACTIVE",
+		ValidFrom:       0,
+		ValidUntil:      -1,
+		CreatedAt:       now,
+		UpdatedAt:       now,
+		LastValidatedAt: now,
+		OrganizationID:  organizationID,
+	}
 }
 
 func NewGettableLicense(data map[string]any, key string) *GettableLicense {

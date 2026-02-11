@@ -16,7 +16,6 @@ import ROUTES from 'constants/routes';
 import { getMetricsListQuery } from 'container/MetricsExplorer/Summary/utils';
 import { useGetMetricsList } from 'hooks/metricsExplorer/useGetMetricsList';
 import { useGetQueryRange } from 'hooks/queryBuilder/useGetQueryRange';
-import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
 import history from 'lib/history';
 import cloneDeep from 'lodash-es/cloneDeep';
 import { CompassIcon, DotIcon, HomeIcon, Plus, Wrench, X } from 'lucide-react';
@@ -51,8 +50,6 @@ export default function Home(): JSX.Element {
 	const [endTime, setEndTime] = useState<number | null>(null);
 	const [updatingUserPreferences, setUpdatingUserPreferences] = useState(false);
 	const [loadingUserPreferences, setLoadingUserPreferences] = useState(true);
-
-	const { isCommunityUser, isCommunityEnterpriseUser } = useGetTenantLicense();
 
 	const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>(
 		defaultChecklistItemsState,
@@ -304,10 +301,7 @@ export default function Home(): JSX.Element {
 		setIsBannerDismissed(true);
 	};
 
-	const showBanner = useMemo(
-		() => !isBannerDismissed && (isCommunityUser || isCommunityEnterpriseUser),
-		[isBannerDismissed, isCommunityUser, isCommunityEnterpriseUser],
-	);
+	const showBanner = false;
 
 	return (
 		<div className="home-container">
@@ -315,7 +309,7 @@ export default function Home(): JSX.Element {
 				{showBanner && (
 					<div className="home-container-banner">
 						<div className="home-container-banner-content">
-							Big News: SigNoz Community Edition now available with SSO (Google OAuth)
+							Big News: Trinity Community Edition now available with SSO (Google OAuth)
 							and API keys -
 							<a
 								href="https://signoz.io/blog/open-source-signoz-now-available-with-sso-and-api-keys/"

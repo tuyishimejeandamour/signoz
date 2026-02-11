@@ -67,12 +67,9 @@ describe('HeaderRightSection', () => {
 	beforeEach(() => {
 		jest.clearAllMocks();
 		mockUseLocation.mockReturnValue(mockLocation);
-		// Default to licensed user (Enterprise or Cloud)
+		// Default to cloud user
 		mockUseGetTenantLicense.mockReturnValue({
 			isCloudUser: true,
-			isEnterpriseSelfHostedUser: false,
-			isCommunityUser: false,
-			isCommunityEnterpriseUser: false,
 		});
 	});
 
@@ -206,80 +203,11 @@ describe('HeaderRightSection', () => {
 	it('should show feedback button for Cloud users when feedback is enabled', () => {
 		mockUseGetTenantLicense.mockReturnValue({
 			isCloudUser: true,
-			isEnterpriseSelfHostedUser: false,
-			isCommunityUser: false,
-			isCommunityEnterpriseUser: false,
 		});
 
 		render(<HeaderRightSection {...defaultProps} />);
 
 		const feedbackButton = document.querySelector('.lucide-square-pen');
 		expect(feedbackButton).toBeInTheDocument();
-	});
-
-	it('should show feedback button for Enterprise self-hosted users when feedback is enabled', () => {
-		mockUseGetTenantLicense.mockReturnValue({
-			isCloudUser: false,
-			isEnterpriseSelfHostedUser: true,
-			isCommunityUser: false,
-			isCommunityEnterpriseUser: false,
-		});
-
-		render(<HeaderRightSection {...defaultProps} />);
-
-		const feedbackButton = document.querySelector('.lucide-square-pen');
-		expect(feedbackButton).toBeInTheDocument();
-	});
-
-	it('should hide feedback button for Community users even when feedback is enabled', () => {
-		mockUseGetTenantLicense.mockReturnValue({
-			isCloudUser: false,
-			isEnterpriseSelfHostedUser: false,
-			isCommunityUser: true,
-			isCommunityEnterpriseUser: false,
-		});
-
-		render(<HeaderRightSection {...defaultProps} />);
-
-		const feedbackButton = document.querySelector('.lucide-square-pen');
-		expect(feedbackButton).not.toBeInTheDocument();
-	});
-
-	it('should hide feedback button for Community Enterprise users even when feedback is enabled', () => {
-		mockUseGetTenantLicense.mockReturnValue({
-			isCloudUser: false,
-			isEnterpriseSelfHostedUser: false,
-			isCommunityUser: false,
-			isCommunityEnterpriseUser: true,
-		});
-
-		render(<HeaderRightSection {...defaultProps} />);
-
-		const feedbackButton = document.querySelector('.lucide-square-pen');
-		expect(feedbackButton).not.toBeInTheDocument();
-	});
-
-	it('should render correct number of buttons when feedback is hidden due to license', () => {
-		mockUseGetTenantLicense.mockReturnValue({
-			isCloudUser: false,
-			isEnterpriseSelfHostedUser: false,
-			isCommunityUser: true,
-			isCommunityEnterpriseUser: false,
-		});
-
-		render(<HeaderRightSection {...defaultProps} />);
-
-		// Should have 2 buttons (announcements + share) instead of 3
-		const buttons = screen.getAllByRole('button');
-		expect(buttons).toHaveLength(2);
-
-		// Verify which buttons are present
-		expect(screen.getByRole('button', { name: /share/i })).toBeInTheDocument();
-		const inboxIcon = document.querySelector('.lucide-inbox');
-		expect(inboxIcon).toBeInTheDocument();
-
-		// Verify feedback button is not present
-		const feedbackIcon = document.querySelector('.lucide-square-pen');
-		expect(feedbackIcon).not.toBeInTheDocument();
 	});
 });

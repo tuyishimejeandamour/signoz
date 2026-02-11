@@ -15,8 +15,6 @@ import { FeatureKeys } from 'constants/features';
 import { LOCALSTORAGE } from 'constants/localStorage';
 import ROUTES from 'constants/routes';
 import AppLayout from 'container/AppLayout';
-import Hex from 'crypto-js/enc-hex';
-import HmacSHA256 from 'crypto-js/hmac-sha256';
 import { KeyboardHotkeysProvider } from 'hooks/hotkeys/useKeyboardHotkeys';
 import { useThemeConfig } from 'hooks/useDarkMode';
 import { useGetTenantLicense } from 'hooks/useGetTenantLicense';
@@ -25,7 +23,6 @@ import { ResourceProvider } from 'hooks/useResourceAttribute';
 import { StatusCodes } from 'http-status-codes';
 import history from 'lib/history';
 import ErrorBoundaryFallback from 'pages/ErrorBoundaryFallback/ErrorBoundaryFallback';
-import posthog from 'posthog-js';
 import { useAppContext } from 'providers/App/App';
 import { IUser } from 'providers/App/types';
 import { CmdKProvider } from 'providers/cmdKProvider';
@@ -50,7 +47,6 @@ function App(): JSX.Element {
 		user,
 		isFetchingUser,
 		isFetchingFeatureFlags,
-		trialInfo,
 		activeLicense,
 		isFetchingActiveLicense,
 		activeLicenseFetchError,
@@ -64,9 +60,7 @@ function App(): JSX.Element {
 
 	const { hostname, pathname } = window.location;
 
-	const { isCloudUser, isEnterpriseSelfHostedUser } = useGetTenantLicense();
-
-	const [isSentryInitialized, setIsSentryInitialized] = useState(false);
+	const { isCloudUser } = useGetTenantLicense();
 
 	const enableAnalytics = useCallback(
 		(user: IUser): void => {
@@ -108,40 +102,7 @@ function App(): JSX.Element {
 				if (domain) {
 					logEvent('Domain Identified', groupTraits, 'group');
 				}
-				if (window && window.Appcues) {
-					window.Appcues.identify(id, {
-						name: displayName,
-						deployment_name: hostNameParts[0],
-						data_region: hostNameParts[1],
-						deployment_url: hostname,
-						company_domain: domain,
-						companyName: orgName,
-						email,
-						paidUser: !!trialInfo?.trialConvertedToSubscription,
-					});
-				}
-
-				posthog?.identify(id, {
-					email,
-					name: displayName,
-					orgName,
-					deployment_name: hostNameParts[0],
-					data_region: hostNameParts[1],
-					deployment_url: hostname,
-					company_domain: domain,
-					source: 'signoz-ui',
-					isPaidUser: !!trialInfo?.trialConvertedToSubscription,
-				});
-
-				posthog?.group('company', orgId, {
-					name: orgName,
-					deployment_name: hostNameParts[0],
-					data_region: hostNameParts[1],
-					deployment_url: hostname,
-					company_domain: domain,
-					source: 'signoz-ui',
-					isPaidUser: !!trialInfo?.trialConvertedToSubscription,
-				});
+				// Appcues, PostHog disabled: external APIs not in this system
 			}
 		},
 		[
@@ -149,7 +110,6 @@ function App(): JSX.Element {
 			isFetchingActiveLicense,
 			activeLicense,
 			org,
-			trialInfo?.trialConvertedToSubscription,
 		],
 	);
 
@@ -176,37 +136,22 @@ function App(): JSX.Element {
 			}
 
 			let updatedRoutes = defaultRoutes;
-			// if the user is a cloud user
-			if (isCloudUser || isEnterpriseSelfHostedUser) {
-				// if the user is on basic plan then remove billing
-				if (isOnBasicPlan) {
-					updatedRoutes = updatedRoutes.filter(
-						(route) =>
-							route?.path !== ROUTES.BILLING && route?.path !== ROUTES.INTEGRATIONS,
-					);
-				}
-
-				if (isEnterpriseSelfHostedUser) {
-					updatedRoutes.push(LIST_LICENSES);
-				}
-
-				// always add support route for cloud users
-				updatedRoutes = [...updatedRoutes, SUPPORT_ROUTE];
-			} else {
-				// if not a cloud user then remove billing and add list licenses route
+			// cloud user: if on basic plan then remove billing
+			if (isOnBasicPlan) {
 				updatedRoutes = updatedRoutes.filter(
 					(route) =>
 						route?.path !== ROUTES.BILLING && route?.path !== ROUTES.INTEGRATIONS,
 				);
-				updatedRoutes = [...updatedRoutes, LIST_LICENSES];
 			}
+
+			// always add support route for cloud users
+			updatedRoutes = [...updatedRoutes, SUPPORT_ROUTE];
 			setRoutes(updatedRoutes);
 		}
 	}, [
 		isLoggedInState,
 		user,
 		isCloudUser,
-		isEnterpriseSelfHostedUser,
 		isFetchingActiveLicense,
 		isFetchingUser,
 		activeLicense,
@@ -218,13 +163,9 @@ function App(): JSX.Element {
 			pathname === ROUTES.ONBOARDING ||
 			pathname.startsWith('/public/dashboard/')
 		) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			window.Pylon('hideChatBubble');
+			window.Pylon?.('hideChatBubble');
 		} else {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-			// @ts-ignore
-			window.Pylon('showChatBubble');
+			window.Pylon?.('showChatBubble');
 		}
 	}, [pathname]);
 
@@ -236,8 +177,7 @@ function App(): JSX.Element {
 		if (
 			!isFetchingFeatureFlags &&
 			(featureFlags || featureFlagsFetchError) &&
-			activeLicense &&
-			trialInfo
+			activeLicense
 		) {
 			let isChatSupportEnabled = false;
 			let isPremiumSupportEnabled = false;
@@ -250,45 +190,19 @@ function App(): JSX.Element {
 					featureFlags.find((flag) => flag.name === FeatureKeys.PREMIUM_SUPPORT)
 						?.active || false;
 			}
-			const showAddCreditCardModal =
-				!isPremiumSupportEnabled && !trialInfo?.trialConvertedToSubscription;
+			const showAddCreditCardModal = !isPremiumSupportEnabled;
 
-			if (
-				isLoggedInState &&
-				isChatSupportEnabled &&
-				!showAddCreditCardModal &&
-				(isCloudUser || isEnterpriseSelfHostedUser)
-			) {
-				const email = user.email || '';
-				const secret = process.env.PYLON_IDENTITY_SECRET || '';
-				let emailHash = '';
-
-				if (email && secret) {
-					emailHash = HmacSHA256(email, Hex.parse(secret)).toString(Hex);
-				}
-
-				window.pylon = {
-					chat_settings: {
-						app_id: process.env.PYLON_APP_ID,
-						email: user.email,
-						name: user.displayName || user.email,
-						email_hash: emailHash,
-					},
-				};
-			}
+			// Pylon chat config disabled: external widget not in this system
 		}
 	}, [
 		isLoggedInState,
 		user,
 		pathname,
-		trialInfo?.trialConvertedToSubscription,
 		featureFlags,
 		isFetchingFeatureFlags,
 		featureFlagsFetchError,
 		activeLicense,
-		trialInfo,
 		isCloudUser,
-		isEnterpriseSelfHostedUser,
 	]);
 
 	useEffect(() => {
@@ -297,44 +211,7 @@ function App(): JSX.Element {
 		}
 	}, [user, isFetchingUser, isCloudUser, enableAnalytics]);
 
-	useEffect(() => {
-		if (isCloudUser || isEnterpriseSelfHostedUser) {
-			if (process.env.POSTHOG_KEY) {
-				posthog.init(process.env.POSTHOG_KEY, {
-					api_host: 'https://us.i.posthog.com',
-					person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
-				});
-			}
-
-			if (!isSentryInitialized) {
-				Sentry.init({
-					dsn: process.env.SENTRY_DSN,
-					tunnel: process.env.TUNNEL_URL,
-					environment: 'production',
-					integrations: [
-						Sentry.browserTracingIntegration(),
-						Sentry.replayIntegration({
-							maskAllText: false,
-							blockAllMedia: false,
-						}),
-					],
-					// Performance Monitoring
-					tracesSampleRate: 1.0, //  Capture 100% of the transactions
-					// Set 'tracePropagationTargets' to control for which URLs distributed tracing should be enabled
-					tracePropagationTargets: [],
-					// Session Replay
-					replaysSessionSampleRate: 0.1, // This sets the sample rate at 10%. You may want to change it to 100% while in development and then sample at a lower rate in production.
-					replaysOnErrorSampleRate: 1.0, // If you're not already sampling the entire session, change the sample rate to 100% when sampling sessions where errors occur.
-				});
-
-				setIsSentryInitialized(true);
-			}
-		} else {
-			posthog.reset();
-			Sentry.close();
-		}
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [isCloudUser, isEnterpriseSelfHostedUser]);
+	// PostHog and Sentry init disabled: external APIs not in this system
 
 	// if the user is in logged in state
 	if (isLoggedInState) {

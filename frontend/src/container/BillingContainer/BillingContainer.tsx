@@ -2,24 +2,20 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMutation, useQuery } from 'react-query';
-import { CheckCircleOutlined, CloudDownloadOutlined } from '@ant-design/icons';
+import { CloudDownloadOutlined } from '@ant-design/icons';
 import { Color } from '@signozhq/design-tokens';
 import {
 	Alert,
 	Button,
 	Card,
-	Col,
 	Flex,
-	Row,
 	Skeleton,
 	Table,
-	Tag,
 	Typography,
 } from 'antd';
 import { ColumnsType } from 'antd/es/table';
 import getUsage, { UsageResponsePayloadProps } from 'api/billing/getUsage';
 import logEvent from 'api/common/logEvent';
-import updateCreditCardApi from 'api/v1/checkout/create';
 import manageCreditCardApi from 'api/v1/portal/create';
 import RefreshPaymentStatus from 'components/RefreshPaymentStatus/RefreshPaymentStatus';
 import Spinner from 'components/Spinner';
@@ -136,7 +132,6 @@ export default function BillingContainer(): JSX.Element {
 	const {
 		user,
 		org,
-		trialInfo,
 		isFetchingActiveLicense,
 		activeLicense,
 		activeLicenseFetchError,
@@ -182,21 +177,19 @@ export default function BillingContainer(): JSX.Element {
 
 			setData(formattedUsageData);
 
-			if (!trialInfo?.onTrial) {
-				const remainingDays = getRemainingDays(billingPeriodEnd) - 1;
+			const remainingDays = getRemainingDays(billingPeriodEnd) - 1;
 
-				setHeaderText(
-					`Your current billing period is from ${getFormattedDate(
-						billingPeriodStart,
-					)} to ${getFormattedDate(billingPeriodEnd)}`,
-				);
-				setDaysRemaining(remainingDays > 0 ? remainingDays : 0);
-				setBillAmount(billTotal);
-			}
+			setHeaderText(
+				`Your current billing period is from ${getFormattedDate(
+					billingPeriodStart,
+				)} to ${getFormattedDate(billingPeriodEnd)}`,
+			);
+			setDaysRemaining(remainingDays > 0 ? remainingDays : 0);
+			setBillAmount(billTotal);
 
 			setApiResponse(data?.payload || {});
 		},
-		[trialInfo?.onTrial],
+		[],
 	);
 
 	const isSubscriptionPastDue =
@@ -212,31 +205,6 @@ export default function BillingContainer(): JSX.Element {
 		enabled: activeLicense !== null,
 		onSuccess: processUsageData,
 	});
-
-	useEffect(() => {
-		if (
-			!isFetchingActiveLicense &&
-			!activeLicenseFetchError &&
-			trialInfo?.onTrial
-		) {
-			const remainingDays = getRemainingDays(trialInfo?.trialEnd);
-
-			setIsFreeTrial(true);
-			setBillAmount(0);
-			setDaysRemaining(remainingDays > 0 ? remainingDays : 0);
-			setHeaderText(
-				`You are in free trial period. Your free trial will end on ${getFormattedDate(
-					trialInfo?.trialEnd,
-				)}`,
-			);
-		}
-	}, [
-		activeLicense,
-		trialInfo?.onTrial,
-		trialInfo?.trialEnd,
-		isFetchingActiveLicense,
-		activeLicenseFetchError,
-	]);
 
 	const columns: ColumnsType<DataType> = [
 		{
@@ -297,16 +265,6 @@ export default function BillingContainer(): JSX.Element {
 		});
 	};
 
-	const { mutate: updateCreditCard, isLoading: isLoadingBilling } = useMutation(
-		updateCreditCardApi,
-		{
-			onSuccess: (data) => {
-				handleBillingOnSuccess(data);
-			},
-			onError: handleBillingOnError,
-		},
-	);
-
 	const {
 		mutate: manageCreditCard,
 		isLoading: isLoadingManageBilling,
@@ -318,31 +276,18 @@ export default function BillingContainer(): JSX.Element {
 	});
 
 	const handleBilling = useCallback(async () => {
-		if (!trialInfo?.trialConvertedToSubscription) {
-			logEvent('Billing : Upgrade Plan', {
-				user: pick(user, ['email', 'userId', 'name']),
-				org,
-			});
+		logEvent('Billing : Manage Billing', {
+			user: pick(user, ['email', 'userId', 'name']),
+			org,
+		});
 
-			updateCreditCard({
-				url: window.location.origin,
-			});
-		} else {
-			logEvent('Billing : Manage Billing', {
-				user: pick(user, ['email', 'userId', 'name']),
-				org,
-			});
-
-			manageCreditCard({
-				url: window.location.origin,
-			});
-		}
+		manageCreditCard({
+			url: window.location.origin,
+		});
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [
 		isFreeTrial,
-		trialInfo?.trialConvertedToSubscription,
 		manageCreditCard,
-		updateCreditCard,
 	]);
 
 	const BillingUsageGraphCallback = useCallback(
@@ -406,11 +351,7 @@ export default function BillingContainer(): JSX.Element {
 		}
 	}, [apiResponse, notifications]);
 
-	const showGracePeriodMessage =
-		!isLoading &&
-		!trialInfo?.trialConvertedToSubscription &&
-		!trialInfo?.onTrial &&
-		trialInfo?.gracePeriodEnd;
+	const showGracePeriodMessage = false;
 
 	return (
 		<div className="billing-container">
@@ -431,8 +372,7 @@ export default function BillingContainer(): JSX.Element {
 				<Flex justify="space-between" align="center">
 					<Flex vertical>
 						<Typography.Title level={5} style={{ marginTop: 2, fontWeight: 500 }}>
-							{isCloudUserVal ? t('teams_cloud') : t('teams')}{' '}
-							{isFreeTrial ? <Tag color="success"> Free Trial </Tag> : ''}
+						{isCloudUserVal ? t('teams_cloud') : t('teams')}
 						</Typography.Title>
 
 						{!isLoading && !isFetchingBillingData && !showGracePeriodMessage ? (
@@ -445,9 +385,9 @@ export default function BillingContainer(): JSX.Element {
 						<Button
 							type="default"
 							size="middle"
-							loading={isLoadingBilling || isLoadingManageBilling}
-							disabled={isLoading || isFetchingBillingData}
-							onClick={handleCsvDownload}
+							loading={isLoadingManageBilling}
+						disabled={isLoading || isFetchingBillingData}
+						onClick={handleCsvDownload}
 							icon={<CloudDownloadOutlined />}
 							className="periscope-btn"
 						>
@@ -457,29 +397,18 @@ export default function BillingContainer(): JSX.Element {
 							data-testid="header-billing-button"
 							type="primary"
 							size="middle"
-							loading={isLoadingBilling || isLoadingManageBilling}
-							disabled={isLoading}
-							onClick={handleBilling}
+							loading={isLoadingManageBilling}
+						disabled={isLoading}
+						onClick={handleBilling}
 						>
-							{trialInfo?.trialConvertedToSubscription
-								? t('manage_billing')
-								: t('upgrade_plan')}
+						{t('manage_billing')}
 						</Button>
 
 						<RefreshPaymentStatus type="tooltip" />
 					</Flex>
 				</Flex>
 
-				{trialInfo?.onTrial && trialInfo?.trialConvertedToSubscription && (
-					<Typography.Text
-						ellipsis
-						style={{ fontWeight: '300', color: '#49aa19', fontSize: 12 }}
-					>
-						{t('card_details_recieved_and_billing_info')}
-					</Typography.Text>
-				)}
-
-				{!isLoading && !isFetchingBillingData && !showGracePeriodMessage
+			{!isLoading && !isFetchingBillingData && !showGracePeriodMessage
 					? headerText && (
 							<Alert
 								message={headerText}
@@ -494,22 +423,7 @@ export default function BillingContainer(): JSX.Element {
 					<Skeleton.Input active style={{ height: 20, marginTop: 20 }} />
 				) : null}
 
-				{!isLoading &&
-				!isFetchingBillingData &&
-				billingData &&
-				trialInfo?.gracePeriodEnd &&
-				showGracePeriodMessage ? (
-					<Alert
-						message={`Your data is safe with us until ${getFormattedDate(
-							trialInfo?.gracePeriodEnd || Date.now(),
-						)}. Please upgrade plan now to retain your data.`}
-						type="info"
-						showIcon
-						style={{ marginTop: 12 }}
-					/>
-				) : null}
-
-				{isSubscriptionPastDue &&
+			{isSubscriptionPastDue &&
 					(!isLoading && !isFetchingBillingData ? (
 						<Alert
 							message={subscriptionPastDueMessage()}
@@ -537,56 +451,6 @@ export default function BillingContainer(): JSX.Element {
 				{(isLoading || isFetchingBillingData) && renderTableSkeleton()}
 			</div>
 
-			{!trialInfo?.trialConvertedToSubscription && (
-				<div className="upgrade-plan-benefits">
-					<Row
-						justify="space-between"
-						align="middle"
-						style={{
-							margin: 0,
-						}}
-						gutter={[16, 16]}
-					>
-						<Col span={20} className="plan-benefits">
-							<Typography.Text className="plan-benefit">
-								<CheckCircleOutlined />
-								{t('upgrade_now_text')}
-							</Typography.Text>
-							<Typography.Text className="plan-benefit">
-								<CheckCircleOutlined />
-								{t('Your billing will start only after the trial period')}
-							</Typography.Text>
-							<Typography.Text className="plan-benefit">
-								<CheckCircleOutlined />
-								<span>
-									{t('checkout_plans')} &nbsp;
-									<a
-										href="https://signoz.io/pricing/"
-										style={{
-											color: '#f99781',
-										}}
-										target="_blank"
-										rel="noreferrer"
-									>
-										{t('here')}
-									</a>
-								</span>
-							</Typography.Text>
-						</Col>
-						<Col span={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-							<Button
-								data-testid="upgrade-plan-button"
-								type="primary"
-								size="middle"
-								loading={isLoadingBilling || isLoadingManageBilling}
-								onClick={handleBilling}
-							>
-								{t('upgrade_plan')}
-							</Button>
-						</Col>
-					</Row>
-				</div>
-			)}
 		</div>
 	);
 }

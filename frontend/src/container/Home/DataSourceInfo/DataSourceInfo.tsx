@@ -8,9 +8,7 @@ import history from 'lib/history';
 import { Globe, Link2 } from 'lucide-react';
 import Card from 'periscope/components/Card/Card';
 import { useAppContext } from 'providers/App/App';
-import { LicensePlatform } from 'types/api/licensesV3/getActive';
 
-import { DOCS_LINKS } from '../constants';
 
 function DataSourceInfo({
 	dataSentToSigNoz,
@@ -23,8 +21,7 @@ function DataSourceInfo({
 
 	const notSendingData = !dataSentToSigNoz;
 
-	const isEnabled =
-		activeLicense && activeLicense.platform === LicensePlatform.CLOUD;
+	const isEnabled = !!activeLicense;
 
 	const {
 		data: deploymentsData,
@@ -60,13 +57,13 @@ function DataSourceInfo({
 	const renderNotSendingData = (): JSX.Element => (
 		<>
 			<Typography className="welcome-title">
-				Hello there, Welcome to your SigNoz workspace
+				Hello there, Welcome to your Trinity workspace
 			</Typography>
 
 			<Typography className="welcome-description">
 				You’re not sending any data yet. <br />
-				SigNoz is so much better with your data ⎯ start by sending your telemetry
-				data to SigNoz.
+				Trinity is so much better with your data ⎯ start by sending your telemetry
+				data to Trinity.
 			</Typography>
 
 			<Card className="welcome-card">
@@ -86,36 +83,12 @@ function DataSourceInfo({
 								tabIndex={0}
 								onClick={(): void => {
 									logEvent('Homepage: Connect dataSource clicked', {});
-
-									if (
-										activeLicense &&
-										activeLicense.platform === LicensePlatform.CLOUD
-									) {
-										history.push(ROUTES.GET_STARTED_WITH_CLOUD);
-									} else {
-										window?.open(
-											DOCS_LINKS.ADD_DATA_SOURCE,
-											'_blank',
-											'noopener noreferrer',
-										);
-									}
+									history.push(ROUTES.GET_STARTED_WITH_CLOUD);
 								}}
 								onKeyDown={(e): void => {
 									if (e.key === 'Enter') {
 										logEvent('Homepage: Connect dataSource clicked', {});
-
-										if (
-											activeLicense &&
-											activeLicense.platform === LicensePlatform.CLOUD
-										) {
-											history.push(ROUTES.GET_STARTED_WITH_CLOUD);
-										} else {
-											window?.open(
-												DOCS_LINKS.ADD_DATA_SOURCE,
-												'_blank',
-												'noopener noreferrer',
-											);
-										}
+										history.push(ROUTES.GET_STARTED_WITH_CLOUD);
 									}
 								}}
 							>
@@ -153,7 +126,7 @@ function DataSourceInfo({
 	const renderDataReceived = (): JSX.Element => (
 		<>
 			<Typography className="welcome-title">
-				Hello there, Welcome to your SigNoz workspace
+				Hello there, Welcome to your Trinity workspace
 			</Typography>
 
 			{!isErrorDeploymentsData && deploymentsData && (

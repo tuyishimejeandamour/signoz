@@ -92,9 +92,9 @@ function DashboardDescription(props: DashboardDescriptionProps): JSX.Element {
 		false,
 	);
 
-	const { isCloudUser, isEnterpriseSelfHostedUser } = useGetTenantLicense();
+	const { isCloudUser } = useGetTenantLicense();
 
-	const isPublicDashboardEnabled = isCloudUser || isEnterpriseSelfHostedUser;
+	const isPublicDashboardEnabled = isCloudUser;
 
 	const selectedData = selectedDashboard
 		? {
